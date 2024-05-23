@@ -4,7 +4,11 @@ import htmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 import imageKeyboardResponse from "@jspsych/plugin-image-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
 
-const jsPsych = initJsPsych();
+const jsPsych = initJsPsych({
+  on_finish: function () {
+    jsPsych.data.displayData();
+  },
+});
 const timeline = [];
 const preload = {
   type: PreloadPlugin,
@@ -38,25 +42,65 @@ const instructions = {
 };
 timeline.push(instructions);
 
-const test_stimuli = [{ stimulus: "/blue.png" }, { stimulus: "/orange.png" }];
+const test_stimuli = [
+  { stimulus: "/blue.png", correct_response: "f" },
+  { stimulus: "/orange.png", correct_response: "j" },
+];
+
 const fixation = {
   type: htmlKeyboardResponse,
   stimulus: '<div style="font-size:60px;">+</div>',
   choices: "NO_KEYS",
-  trial_duration: 1000,
+  trial_duration: function () {
+    return jsPsych.randomization.sampleWithoutReplacement(
+      [250, 500, 750, 1000, 1250, 1500, 1750, 2000],
+      1,
+    )[0];
+  },
+  data: { task: "fixation" },
 };
 
 const test = {
   type: imageKeyboardResponse,
   stimulus: jsPsych.timelineVariable("stimulus"),
   choices: ["f", "j"],
+  data: {
+    task: "response",
+    correct_response: jsPsych.timelineVariable("correct_response"),
+  },
+  on_finish: function (data) {
+    data.correct = jsPsych.pluginAPI.compareKeys(
+      data.response,
+      data.correct_response,
+    );
+  },
 };
 
 const test_procedure = {
   timeline: [fixation, test],
   timeline_variables: test_stimuli,
+  randomize_order: true,
+  repetitions: 5,
 };
 timeline.push(test_procedure);
+
+const debrief_block = {
+  type: htmlKeyboardResponse,
+  stimulus: function () {
+    const trials = jsPsych.data.get().filter({ task: "response" });
+    const correct_trials = trials.filter({ correct: true });
+    const accuracy = Math.round(
+      (correct_trials.count() / trials.count()) * 100,
+    );
+    const rt = Math.round(correct_trials.select("rt").mean());
+
+    return `<p>You responded correctly on ${accuracy}% of the trials.</p>
+      <p>Your average response time was ${rt}ms.</p>
+      <p>Press any key to complete the experiment. Thank you!</p>`;
+  },
+};
+timeline.push(debrief_block);
+
 export default function experiment1() {
   jsPsych.run(timeline);
 }

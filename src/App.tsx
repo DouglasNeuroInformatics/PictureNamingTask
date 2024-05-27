@@ -3,8 +3,12 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import experiment1 from "./experiment";
+import stimulusPopulator from "./stimulus_populator";
+
 
 const exp1 = experiment1();
+const pop = stimulusPopulator(1)
+const pop2 = stimulusPopulator(2)
 
 function App() {
   const [count, setCount] = useState(0);
@@ -32,6 +36,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
       <script>exp1</script>
+
     </>
   );
 }

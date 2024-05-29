@@ -11,7 +11,7 @@ const DifficultySelectorComponent: React.FC<DifficultySelectorProps> = ({
   onSelect,
 }) => {
   const levels = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  const [selectedDifficulty, setSelectedDifficulty] = React.useState<number>(2);
+  const [selectedDifficulty, setSelectedDifficulty] = React.useState<number>(0);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newDifficulty = Number(event.target.value);

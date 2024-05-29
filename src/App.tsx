@@ -18,8 +18,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (selectedDifficulty !== null) {
       // Call experiment2 after DifficultySelectorComponent has set the selected difficulty
-      //experiment2(selectedDifficulty);
-      experiment2();
+      experiment2(selectedDifficulty);
     }
   }, [selectedDifficulty]);
 

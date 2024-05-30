@@ -1,7 +1,7 @@
 // App.tsx
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import experiment2 from "./experiment2.ts";
+import pictureNamingTask from "./pictureNamingTask.ts";
 import DifficultySelectorComponent from "./DifficultySelector.tsx";
 
 const App: React.FC = () => {
@@ -18,7 +18,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (selectedDifficulty !== null) {
       // Call experiment2 after DifficultySelectorComponent has set the selected difficulty
-      experiment2(selectedDifficulty);
+      pictureNamingTask(selectedDifficulty);
     }
   }, [selectedDifficulty]);
 

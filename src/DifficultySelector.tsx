@@ -31,7 +31,6 @@ const DifficultySelectorComponent: React.FC<DifficultySelectorProps> = ({
           </option>
         ))}
       </select>
-      {selectedDifficulty !== "" && <p>You selected: {selectedDifficulty}</p>}
     </div>
   );
 };

@@ -6,8 +6,8 @@ experiment_stimuli
 */
 
 const imgBank = IMG_BANK;
-function getRandomElementUnique(array, numberElements) {
-  const indiciesSelected = [];
+function getRandomElementUnique(array: any[], numberElements: number) {
+  const indiciesSelected: number[] = [];
   // needs a to return an error when array is empty
   // currently will be an infinite loop =O
   function getAnElement() {
@@ -28,11 +28,8 @@ function getRandomElementUnique(array, numberElements) {
   return result;
 }
 
-
-
 // draw 5 images at random from the bank depending on the difficulty_level selected
-export default function createStimuli(difficultyLevel) {
-
+export default function createStimuli(difficultyLevel: number) {
   let imgList = imgBank.filter(
     (image) => image.difficulty_level === difficultyLevel,
   );
@@ -40,5 +37,4 @@ export default function createStimuli(difficultyLevel) {
   // can be changed later if need be
   let result = getRandomElementUnique(imgList, 5);
   return result;
-
 }

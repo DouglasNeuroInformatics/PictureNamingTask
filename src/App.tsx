@@ -1,4 +1,3 @@
-// App.tsx
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import pictureNamingTask from "./pictureNamingTask.ts";
@@ -11,13 +10,11 @@ const App: React.FC = () => {
 
   const handleDifficultyChange = (difficulty: number) => {
     setSelectedDifficulty(difficulty);
-    // Optionally, call experiment2 here if it needs to run synchronously
-    // experiment2();
   };
 
   useEffect(() => {
     if (selectedDifficulty !== null) {
-      // Call experiment2 after DifficultySelectorComponent has set the selected difficulty
+      // Call pictureNamingTask after DifficultySelectorComponent has set the selected difficulty
       pictureNamingTask(selectedDifficulty);
     }
   }, [selectedDifficulty]);

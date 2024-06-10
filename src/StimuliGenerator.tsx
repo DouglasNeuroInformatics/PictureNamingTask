@@ -35,6 +35,6 @@ export default function createStimuli(difficultyLevel: number) {
   );
   // default number of images to do is 5
   // can be changed later if need be
-  let result = getRandomElementUnique(imgList, 5);
+  let result = getRandomElementUnique(imgList, 1);
   return result;
 }

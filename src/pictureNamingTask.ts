@@ -6,6 +6,7 @@ import surveyText from "@jspsych/plugin-survey-text";
 import imageButtonResponse from "@jspsych/plugin-image-button-response";
 import createStimuli from "./StimuliGenerator";
 import htmlButtonResponse from "@jspsych/plugin-html-button-response";
+import surveyHtmlForm from "@jspsych/plugin-survey-html-form"
 
 //****************************
 //********EXPERIMENT**********
@@ -13,7 +14,7 @@ import htmlButtonResponse from "@jspsych/plugin-html-button-response";
 // a timeline is a set of trials
 // a trial is a single object eg htmlKeyboardResponse etc ...
 const timeline: any[] = [];
-let imgUrl: string;
+let imgUrl: string
 
 export default function pictureNamingTask(difficultyLevelParam: number) {
   // setting up the stimuli
@@ -47,52 +48,23 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
       prompt: `<p>Press any key to proceed</p>`,
       stimulus: jsPsych.timelineVariable("stimulus"),
     };
-    const buttonAndTextBoxTrial = {
-      on_start: function() {
-      },
-      type: htmlButtonResponse,
-      stimulus: `
-            <h3>Log the response</h3>
-            <button id="Correct" onclick="document.getElementById('result').value='Correct';">Correct</button>
-            <button id="Incorrect" onclick="document.getElementById('result').value='Incorrect';">Incorrect</button>
-		    <br>
-            <label for="result">The response was:</label>
-            <input type="text" id="result" name="result">
-				<hr>
-		    <textarea id="textBox" rows="4" cols="50" placeholder="log any other notes here"></textarea>
-            <p>Press any key to submit the response continue</p>
-        `
-      ,
-      choices: ['Continue'],
-      data: {
-        image_shown: '',
-        results: '',
-      },
-      on_finish: function(data: any) {
-
-        data.image_shown = jsPsych.timelineVariable('stimulus'),
-          console.log()
-
-      }
-    };
-    const loggingCorrectOrIncorrect = {
-      type: imageButtonResponse,
-      stimulus: jsPsych.timelineVariable("stimulus"),
-      prompt: `<p> Please log the response</p>`,
-      choices: ["Correct", "Incorrect"],
-    };
-    const loggingResponse = {
-      type: surveyText,
-      on_start: function(trial: any) {
-        imgUrl = JSON.stringify(jsPsych.timelineVariable("stimulus"));
-        //console.log(imgUrl)
-        trial.preamble = `<img src=${imgUrl} style='width:400px'></img>`;
-      },
-      questions: [{ prompt: "Enter participant response" }],
+    const logging = {
+      type: surveyHtmlForm,
+      html: `
+    <h3>Log the response</h3>
+    <input type="button" value="Correct" onclick="document.getElementById('result').value='Correct';">
+    <input type="button" value="Incorrect" onclick="document.getElementById('result').value='Incorrect';">
+    <br>
+    <label for="result">The response was:</label>
+    <input type="text" id="result" name="result" readonly>
+    <hr>
+    <input type="text" id="textBox" name="extra_info" placeholder="Log any other notes here">
+    <p>Press any key to submit the response and continue</p>
+  `,
     };
 
     const test_procedure = {
-      timeline: [blankPage, buttonAndTextBoxTrial, showImg, blankPage, loggingCorrectOrIncorrect, loggingResponse, blankPage],
+      timeline: [blankPage, showImg, blankPage, logging, blankPage],
       timeline_variables: experiment_stimuli,
       // to reload the experiment_stimuli after one repetition has been completed
       on_timeline_start: function() {

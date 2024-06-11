@@ -6,7 +6,7 @@ import surveyText from "@jspsych/plugin-survey-text";
 import imageButtonResponse from "@jspsych/plugin-image-button-response";
 import createStimuli from "./StimuliGenerator";
 import htmlButtonResponse from "@jspsych/plugin-html-button-response";
-import surveyHtmlForm from "@jspsych/plugin-survey-html-form"
+import surveyHtmlForm from "@jspsych/plugin-survey-html-form";
 
 //****************************
 //********EXPERIMENT**********
@@ -14,7 +14,12 @@ import surveyHtmlForm from "@jspsych/plugin-survey-html-form"
 // a timeline is a set of trials
 // a trial is a single object eg htmlKeyboardResponse etc ...
 const timeline: any[] = [];
-let imgUrl: string
+let imgUrl: string;
+let numberOfCorrectAnswers: number = 0;
+const totalNumberOfTrialsToRun: number = 5;
+let numberOfTrialsRun: number = 1;
+let advancementSchedule: number = 2;
+let regressionSchedule: number = 0;
 
 export default function pictureNamingTask(difficultyLevelParam: number) {
   // setting up the stimuli
@@ -22,7 +27,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   let currentDifficultyLevel: number = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
-      on_finish: function() {
+      on_finish: function () {
         // first argument is the format, second is the filename.
         // the format can be either 'csv' or 'json'.
         // no timezone offset
@@ -42,7 +47,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     const blankPage = {
       type: htmlKeyboardResponse,
       stimulus: "",
-    }
+    };
     const showImg = {
       type: imageKeyboardResponse,
       prompt: `<p>Press any key to proceed</p>`,
@@ -63,29 +68,82 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   `,
     };
 
-    const test_procedure = {
+    const testProcedure = {
       timeline: [blankPage, showImg, blankPage, logging, blankPage],
       timeline_variables: experiment_stimuli,
       // to reload the experiment_stimuli after one repetition has been completed
-      on_timeline_start: function() {
+      on_timeline_start: function () {
         this.timeline_variables = experiment_stimuli;
       },
     };
-    timeline.push(test_procedure);
+    timeline.push(testProcedure);
 
     const repeat = {
       type: htmlButtonResponse,
       stimulus: `<p> Repeat?</p>`,
       choices: ["Repeat", "End"],
     };
-    timeline.push(repeat);
+    //    timeline.push(repeat);
 
     const loop_node = {
       timeline: timeline,
-      loop_function: function(data: any) {
+      loop_function: function (data: any) {
+        // tracking number of corret answers
+        // need to access logging trial info
+        if (numberOfTrialsRun < totalNumberOfTrialsToRun) {
+          // getting the most recent logged result
+          const loggingResponseArray: [] = jsPsych.data
+            .get()
+            .filter({ trial_type: "survey-html-form" })["trials"];
+          const lastTrialIndex = loggingResponseArray.length - 1;
+          const lastTrialResults =
+            loggingResponseArray[lastTrialIndex]["response"];
+          console.log(numberOfTrialsRun);
+          console.log(totalNumberOfTrialsToRun);
+          console.log(lastTrialResults);
+          console.log(numberOfCorrectAnswers);
+
+          if (lastTrialResults["result"] === "Correct") {
+            console.log("gwan ya boy ya");
+            numberOfCorrectAnswers++;
+            console.log(numberOfCorrectAnswers);
+          } else if (lastTrialResults["result"] === "Incorrect") {
+            numberOfCorrectAnswers = 0;
+          }
+          // difficulty level logic, 2 correct answers in a row, increase, one incorret answer decrease
+          // not sure this makes sense
+          if (numberOfCorrectAnswers === advancementSchedule) {
+            currentDifficultyLevel++;
+            console.log("difficulty++");
+            console.log(currentDifficultyLevel);
+            // need to reset as difficulty has changed
+            numberOfCorrectAnswers = 0;
+          } else if (numberOfCorrectAnswers === regressionSchedule) {
+            if (currentDifficultyLevel > 1) {
+              currentDifficultyLevel--;
+              console.log("difficulty--");
+              console.log(currentDifficultyLevel);
+            }
+          }
+          experiment_stimuli = createStimuli(currentDifficultyLevel);
+          numberOfTrialsRun++;
+          console.log("number run");
+          console.log(numberOfTrialsRun);
+
+          return true;
+        } else if (numberOfTrialsRun === totalNumberOfTrialsToRun) {
+          return false;
+        }
+      },
+    };
+
+    const loop_node_old = {
+      timeline: timeline,
+      loop_function: function (data: any) {
         console.log(data.values);
-        // check if repeat button was presssed
+
         if (
+          // checks if repeat was pressed
           jsPsych.pluginAPI.compareKeys(
             String(data.values()[data.values().length - 1].response),
             "0",
@@ -93,7 +151,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
         ) {
           const correctResults = jsPsych.data
             .get()
-            .filter({ trial_type: "image-button-response", response: 0 })
+            .filter({ trial_type: "survey-html-form", response: "result" })
             .count();
           const numberTrials = jsPsych.data
             .get()

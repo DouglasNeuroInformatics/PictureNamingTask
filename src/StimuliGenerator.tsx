@@ -1,4 +1,5 @@
 import IMG_BANK from "./imgBank";
+import jsPsych from "jspsych";
 
 /*
 functions for generating
@@ -6,6 +7,7 @@ experiment_stimuli
 */
 
 const imgBank = IMG_BANK;
+
 function getRandomElementUnique(array: any[], numberElements: number) {
   const indiciesSelected: number[] = [];
   // needs a to return an error when array is empty

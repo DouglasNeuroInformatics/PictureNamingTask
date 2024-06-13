@@ -1,6 +1,4 @@
-// need to make a script to do this
-// and put in a sep file or something
-const IMG_BANK = [
+export const IMG_BANK = [
   {
     stimulus: "../public/level1/art-containes.jpg",
     difficulty_level: 1,
@@ -137,4 +135,3 @@ const IMG_BANK = [
     correct_response: "teeth",
   },
 ];
-export default IMG_BANK;

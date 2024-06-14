@@ -33,7 +33,7 @@ function getRandomElementUnique(array: any[], numberElements: number) {
 // draw 5 images at random from the bank depending on the difficulty_level selected
 export default function createStimuli(difficultyLevel: number) {
   let imgList = imgBank.filter(
-    (image) => image.difficulty_level === difficultyLevel,
+    (image) => image.difficultyLevel === difficultyLevel,
   );
   // default number of images to do is 5
   // can be changed later if need be

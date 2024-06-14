@@ -19,30 +19,36 @@ export function dataMunger(data: any) {
       const rt = element["rt"];
       const result = element["response"]["result"];
       const notes = element["response"]["notes"];
-      // TODO add these
-      //
-      //
-      //const correctResponse = element["response"]["correctReponse"];
-      //const stimuli = element["response"]["stimuli"];
+      const correctResponse = element["correctResponse"];
+      const stimulus = element["stimulus"];
+      const difficultyLevel = element['difficultyLevel']
       console.log(`rt ${rt}`);
-      experimentResults.push({ rt, result, notes });
+      experimentResults.push({ rt, result, notes, stimulus, correctResponse, difficultyLevel });
     }
   }
+  console.log('exp res')
+  console.log(experimentResults)
   console.table(experimentResults);
   return experimentResults;
 }
 
 function arrayToCSV(array: any[]) {
+  console.log(`array ${array}`)
   const header = Object.keys(array[0]).join(",");
+
+  console.log(`header ${header}`)
   const rows = array
-    .slice(1)
     .map((row) => Object.values(row).join(","))
     .join("\n");
+  console.log(`rows, ${rows}`)
+  console.log("%%%%%%%%%%%")
   return `${header}\n${rows}`;
 }
 
 function downloadCSV(dataForCSV: any, filename: string) {
   const blob = new Blob([dataForCSV], { type: "text/csv;charset=utf8" });
+  console.log('blob')
+  console.table(blob)
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
@@ -54,8 +60,10 @@ function downloadCSV(dataForCSV: any, filename: string) {
 
 export function transformAndDownload(data: any) {
   const mungedData = dataMunger(data);
+  console.log(`mungedData ${mungedData}`);
   console.table(mungedData);
   const dataForCSV = arrayToCSV(mungedData);
+  console.log(`dataForCSV ${dataForCSV}`);
   console.table(dataForCSV);
   // no timezone offset
   const currentDate = String(

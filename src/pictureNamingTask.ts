@@ -17,6 +17,9 @@ const totalNumberOfTrialsToRun: number = 1;
 let numberOfTrialsRun: number = 1;
 let advancementSchedule: number = 2;
 let regressionSchedule: number = 0;
+let displayDifficultyLevel = ''
+let displayCorrectResponse = ''
+let cr
 
 export default function pictureNamingTask(difficultyLevelParam: number) {
   // setting up the stimuli
@@ -24,7 +27,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   let currentDifficultyLevel: number = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
-      on_finish: function () {
+      on_finish: function() {
         // jsPsych.data.get().localSave("csv", `${currentDate}.csv`);
         transformAndDownload(jsPsych.data);
       },
@@ -50,12 +53,12 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
       type: ImageKeyboardResponsePlugin,
       stimulus: jsPsych.timelineVariable("stimulus"),
     };
+
     const logging = {
       type: SurveyHtmlFormPlugin,
+      preamble: jsPsych.timelineVariable('correctResponse'),
       html: `
     <h3>Log the response</h3>
-    <input type="image" src="$jsPsych.timelineVariable('stimulus')">
-
     <input type="button" value="Correct" onclick="document.getElementById('result').value='Correct';">
     <input type="button" value="Incorrect" onclick="document.getElementById('result').value='Incorrect';">
     <br>
@@ -65,13 +68,20 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     <input type="text" id="textBox" name="notes" placeholder="Log any other notes here">
     <p>Press any key to submit the response and continue</p>
   `,
+      autofocus: 'textBox',
+      data: {
+        difficultyLevel: jsPsych.timelineVariable('difficultyLevel'),
+        correctResponse: jsPsych.timelineVariable('correctResponse')
+      },
+
     };
+
 
     const testProcedure = {
       timeline: [preload, blankPage, showImg, blankPage, logging, blankPage],
       timeline_variables: experiment_stimuli,
       // to reload the experiment_stimuli after one repetition has been completed
-      on_timeline_start: function () {
+      on_timeline_start: function() {
         this.timeline_variables = experiment_stimuli;
       },
     };
@@ -79,7 +89,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
 
     const loop_node = {
       timeline: timeline,
-      loop_function: function (data: any) {
+      loop_function: function(data: any) {
         // tracking number of corret answers
         // need to access logging trial info
         if (numberOfTrialsRun < totalNumberOfTrialsToRun) {

@@ -6,6 +6,7 @@ import SurveyHtmlFormPlugin from "@jspsych/plugin-survey-html-form";
 import ImageKeyboardResponsePlugin from "@jspsych/plugin-image-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
 import { transformAndDownload } from "./DataMunger";
+import { advancementSchedule, totalNumberOfTrialsToRun, regressionSchedule } from "../config.ts/"
 //****************************
 //********EXPERIMENT**********
 //****************************
@@ -13,10 +14,9 @@ import { transformAndDownload } from "./DataMunger";
 // a trial is a single object eg htmlKeyboardResponse etc ...
 const timeline: any[] = [];
 let numberOfCorrectAnswers: number = 0;
-const totalNumberOfTrialsToRun: number = 1;
 let numberOfTrialsRun: number = 1;
-let advancementSchedule: number = 2;
-let regressionSchedule: number = 0;
+//let advancementSchedule: number = 2;
+//let regressionSchedule: number = 0;
 let displayDifficultyLevel = ''
 let displayCorrectResponse = ''
 let cr

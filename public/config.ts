@@ -1,17 +1,17 @@
 // set the number of images to be shown
-export const totalNumberOfTrialsToRun = 5
+export const totalNumberOfTrialsToRun: number = 5
 /*
  set the number of correct responses to advance to the next difficulty level
  example: advancementSchedule = 2
  2 correct response in row increases difficulty level by 1
  */
-export const advancementSchedule = 2
+export const advancementSchedule: number = 2
 /*
  set the number of correct responses to advance to the next difficulty level
  example: advancementSchedule = 2
  2 correct response in row increases difficulty level by 1
 */
-export const regressionSchedule = 0
+export const regressionSchedule: number = 0
 /*
  an array of objects that contain the information for the experiments
  all field are required 

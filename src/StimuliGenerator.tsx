@@ -1,13 +1,13 @@
-import IMG_BANK from "./imgBank";
-import jsPsych from "jspsych";
 
+import { IMG_BANK } from "../public/config.ts"
 /*
 functions for generating
 experiment_stimuli
 */
 
 const imgBank = IMG_BANK;
-
+// TODO this should be refactor as only one image is needed at a time
+// need to add psudeo random seed too
 function getRandomElementUnique(array: any[], numberElements: number) {
   const indiciesSelected: number[] = [];
   // needs a to return an error when array is empty
@@ -30,13 +30,11 @@ function getRandomElementUnique(array: any[], numberElements: number) {
   return result;
 }
 
-// draw 5 images at random from the bank depending on the difficulty_level selected
+// draw an image at random from the bank depending on the difficulty_level selected
 export default function createStimuli(difficultyLevel: number) {
   let imgList = imgBank.filter(
-    (image) => image.difficultyLevel === difficultyLevel,
+    (image: any) => image.difficultyLevel === difficultyLevel,
   );
-  // default number of images to do is 5
-  // can be changed later if need be
   let result = getRandomElementUnique(imgList, 1);
   return result;
 }

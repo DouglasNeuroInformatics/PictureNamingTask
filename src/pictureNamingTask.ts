@@ -6,7 +6,7 @@ import SurveyHtmlFormPlugin from "@jspsych/plugin-survey-html-form";
 import ImageKeyboardResponsePlugin from "@jspsych/plugin-image-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
 import { transformAndDownload } from "./DataMunger";
-import { advancementSchedule, totalNumberOfTrialsToRun, regressionSchedule } from "../config.ts/"
+import { advancementSchedule, totalNumberOfTrialsToRun, regressionSchedule } from "../public/config.ts/"
 //****************************
 //********EXPERIMENT**********
 //****************************
@@ -17,9 +17,9 @@ let numberOfCorrectAnswers: number = 0;
 let numberOfTrialsRun: number = 1;
 //let advancementSchedule: number = 2;
 //let regressionSchedule: number = 0;
-let displayDifficultyLevel = ''
-let displayCorrectResponse = ''
-let cr
+//let displayDifficultyLevel = ''
+//let displayCorrectResponse = ''
+//let cr
 
 export default function pictureNamingTask(difficultyLevelParam: number) {
   // setting up the stimuli
@@ -90,6 +90,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     const loop_node = {
       timeline: timeline,
       loop_function: function(data: any) {
+        data = data
         // tracking number of corret answers
         // need to access logging trial info
         if (numberOfTrialsRun < totalNumberOfTrialsToRun) {

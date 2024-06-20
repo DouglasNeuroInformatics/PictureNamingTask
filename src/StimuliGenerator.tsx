@@ -1,13 +1,11 @@
-
-import { IMG_BANK } from "../public/config.ts"
 /*
 functions for generating
 experiment_stimuli
 */
 
-const imgBank = IMG_BANK;
-// TODO this should be refactor as only one image is needed at a time
-// need to add psudeo random seed too
+import { imgDB } from "./main";
+
+// TODO this should be refactor as only one image is needed at a time need to add psudeo random seed too
 function getRandomElementUnique(array: any[], numberElements: number) {
   const indiciesSelected: number[] = [];
   // needs a to return an error when array is empty
@@ -32,9 +30,19 @@ function getRandomElementUnique(array: any[], numberElements: number) {
 
 // draw an image at random from the bank depending on the difficulty_level selected
 export default function createStimuli(difficultyLevel: number) {
-  let imgList = imgBank.filter(
-    (image: any) => image.difficultyLevel === difficultyLevel,
-  );
-  let result = getRandomElementUnique(imgList, 1);
-  return result;
+  try {
+    const imgBank = imgDB;
+    console.log(imgBank);
+    let imgList = imgBank?.data;
+    console.log(imgList);
+    imgList = imgList.filter(
+      (image: any) => Number(image.difficultyLevel) === difficultyLevel,
+    );
+    console.log("filtered");
+    console.log(imgList);
+    let result = getRandomElementUnique(imgList, 1);
+    return result;
+  } catch (error) {
+    console.error("Error fetching and parsing data:", error);
+  }
 }

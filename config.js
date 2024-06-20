@@ -1,6 +1,25 @@
-// need to make a script to do this
-// and put in a sep file or something
-const IMG_BANK = [
+// set the number of images to be shown
+export const totalNumberOfTrialsToRun = 5;
+/*
+ set the number of correct responses to advance to the next difficulty level
+ example: advancementSchedule = 2
+ 2 correct response in row increases difficulty level by 1
+ */
+export const advancementSchedule = 2;
+/*
+ set the number of correct responses to advance to the next difficulty level
+ example: advancementSchedule = 2
+ 2 correct response in row increases difficulty level by 1
+*/
+export const regressionSchedule = 0;
+/*
+ an array of objects that contain the information for the experiments
+ all field are required 
+ 'stimulus' - realtive path where to find the image
+ 'difficultyLevel' - the difficulty level that has been assigned to the image
+ 'correctResponse' - what the correct response for the image will be
+*/ pv;
+export const IMG_BANK = [
   {
     stimulus: "../public/level1/art-containes.jpg",
     difficultyLevel: 1,
@@ -87,7 +106,7 @@ const IMG_BANK = [
     correctResponse: "mice",
   },
   {
-    stimulus: "../public/level3/motorbike-dirt.jpg",
+    stimulus: "level3/motorbike-dirt.jpg",
     difficultyLevel: 5,
     correctResponse: "motorbike-dirt",
   },
@@ -137,4 +156,3 @@ const IMG_BANK = [
     correctResponse: "teeth",
   },
 ];
-export default IMG_BANK;

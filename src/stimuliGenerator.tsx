@@ -3,7 +3,7 @@ functions for generating
 experiment_stimuli
 */
 
-import { imgDB } from "./main";
+import { imgDB } from "./fetchAndParse";
 
 // TODO this should be refactor as only one image is needed at a time need to add psudeo random seed too
 function getRandomElementUnique(array: any[], numberElements: number) {
@@ -25,18 +25,28 @@ function getRandomElementUnique(array: any[], numberElements: number) {
   while (result.length < numberElements) {
     result.push(getAnElement());
   }
+  console.log(`result from createStimuli:`);
+  console.log("***********************");
+  console.dir(result);
+  console.table(result);
+  console.log("***********************");
   return result;
 }
 
 // draw an image at random from the bank depending on the difficulty_level selected
-export default function createStimuli(difficultyLevel: number) {
+export default function createStimuli(
+  difficultyLevel: number,
+  language: string,
+) {
   try {
     const imgBank = imgDB;
     console.log(imgBank);
     let imgList = imgBank?.data;
     console.log(imgList);
     imgList = imgList.filter(
-      (image: any) => Number(image.difficultyLevel) === difficultyLevel,
+      (image: any) =>
+        Number(image.difficultyLevel) === difficultyLevel &&
+        image.language === language,
     );
     console.log("filtered");
     console.log(imgList);

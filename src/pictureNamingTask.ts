@@ -1,17 +1,12 @@
 import { initJsPsych } from "jspsych";
 import "jspsych/css/jspsych.css";
-import createStimuli from "./StimuliGenerator";
+import createStimuli from "./stimuliGenerator";
 import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import SurveyHtmlFormPlugin from "@jspsych/plugin-survey-html-form";
 import ImageKeyboardResponsePlugin from "@jspsych/plugin-image-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
-import { transformAndDownload } from "./DataMunger";
-/*import {
-  advancementSchedule,
-  totalNumberOfTrialsToRun,
-  regressionSchedule,
-} from "../public/config.js";
-*/
+import { transformAndDownload } from "./dataMunger";
+import { experimentSettings } from "./fetchAndParse";
 
 //****************************
 //********EXPERIMENT**********
@@ -21,21 +16,25 @@ import { transformAndDownload } from "./DataMunger";
 const timeline: any[] = [];
 let numberOfCorrectAnswers: number = 0;
 let numberOfTrialsRun: number = 1;
-let advancementSchedule: number = 2;
-let regressionSchedule: number = 0;
-let totalNumberOfTrialsToRun = 2;
 //let displayDifficultyLevel = ''
 //let displayCorrectResponse = ''
-//let cr
+let cr;
 
+let settings = experimentSettings?.data;
+let totalNumberOfTrialsToRun = Number(settings[0].totalNumberOfTrialsToRun);
+let advancementSchedule = Number(settings[0].advancementSchedule);
+let regressionSchedule = Number(settings[0].regressionSchedule);
+let language = settings[0].language;
+console.log(
+  `Experiment will proceed with totalNumberOfTrialsToRun of ${totalNumberOfTrialsToRun}, an advancementSchedule of ${advancementSchedule}, and a regressionSchedule of ${regressionSchedule}`,
+);
 export default function pictureNamingTask(difficultyLevelParam: number) {
   // setting up the stimuli
-  let experiment_stimuli = createStimuli(difficultyLevelParam);
+  let experiment_stimuli = createStimuli(difficultyLevelParam, language);
   let currentDifficultyLevel: number = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
       on_finish: function () {
-        // jsPsych.data.get().localSave("csv", `${currentDate}.csv`);
         transformAndDownload(jsPsych.data);
       },
     });
@@ -63,7 +62,14 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
 
     const logging = {
       type: SurveyHtmlFormPlugin,
-      preamble: jsPsych.timelineVariable("correctResponse"),
+      preamble: function () {
+        const html = `<h3>Correct response: </h3>
+                    <p>${jsPsych.timelineVariable("correctResponse")}</p>
+                    <img src="${jsPsych.timelineVariable("stimulus")}" width="300" height="300">`;
+
+        return html;
+      },
+      //preamble: jsPsych.timelineVariable("correctResponse"),
       html: `
     <h3>Log the response</h3>
     <input type="button" value="Correct" onclick="document.getElementById('result').value='Correct';">
@@ -81,7 +87,6 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
         correctResponse: jsPsych.timelineVariable("correctResponse"),
       },
     };
-
     const testProcedure = {
       timeline: [preload, blankPage, showImg, blankPage, logging, blankPage],
       timeline_variables: experiment_stimuli,
@@ -98,6 +103,8 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
         data = data;
         // tracking number of corret answers
         // need to access logging trial info
+        cr = jsPsych.timelineVariable("correctResponse");
+        console.dir(cr);
         if (numberOfTrialsRun < totalNumberOfTrialsToRun) {
           // getting the most recent logged result
           const loggingResponseArray: [] = jsPsych.data
@@ -123,7 +130,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
               currentDifficultyLevel--;
             }
           }
-          experiment_stimuli = createStimuli(currentDifficultyLevel);
+          experiment_stimuli = createStimuli(currentDifficultyLevel, language);
           numberOfTrialsRun++;
           console.log(`numberOfTrialsRun: ${numberOfTrialsRun}`);
           return true;

@@ -41,6 +41,8 @@ export default function createStimuli(
   try {
     let imgList = imageDB
     console.log(imgList);
+    console.table(imageDB)
+    console.log(imageDB.keys)
     imgList = imgList.filter(
       (image: any) =>
         Number(image.difficultyLevel) === difficultyLevel &&

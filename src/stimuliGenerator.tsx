@@ -3,7 +3,7 @@ functions for generating
 experiment_stimuli
 */
 
-import { imgDB } from "./fetchAndParse";
+import { imageDB } from "./fetchAndParse";
 
 // TODO this should be refactor as only one image is needed at a time need to add psudeo random seed too
 function getRandomElementUnique(array: any[], numberElements: number) {
@@ -39,9 +39,7 @@ export default function createStimuli(
   language: string,
 ) {
   try {
-    const imgBank = imgDB;
-    console.log(imgBank);
-    let imgList = imgBank?.data;
+    let imgList = imageDB
     console.log(imgList);
     imgList = imgList.filter(
       (image: any) =>

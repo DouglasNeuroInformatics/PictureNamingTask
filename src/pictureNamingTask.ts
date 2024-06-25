@@ -18,13 +18,11 @@ let numberOfCorrectAnswers: number = 0;
 let numberOfTrialsRun: number = 1;
 //let displayDifficultyLevel = ''
 //let displayCorrectResponse = ''
-let cr;
-
-let settings = experimentSettings?.data;
-let totalNumberOfTrialsToRun = Number(settings[0].totalNumberOfTrialsToRun);
-let advancementSchedule = Number(settings[0].advancementSchedule);
-let regressionSchedule = Number(settings[0].regressionSchedule);
-let language = settings[0].language;
+//
+let totalNumberOfTrialsToRun = Number(experimentSettings.totalNumberOfTrialsToRun)
+let advancementSchedule = Number(experimentSettings.advancementSchedule)
+let regressionSchedule = Number(experimentSettings.regressionSchedule)
+let language = experimentSettings.language
 console.log(
   `Experiment will proceed with totalNumberOfTrialsToRun of ${totalNumberOfTrialsToRun}, an advancementSchedule of ${advancementSchedule}, and a regressionSchedule of ${regressionSchedule}`,
 );
@@ -34,7 +32,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   let currentDifficultyLevel: number = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
-      on_finish: function () {
+      on_finish: function() {
         transformAndDownload(jsPsych.data);
       },
     });
@@ -62,14 +60,13 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
 
     const logging = {
       type: SurveyHtmlFormPlugin,
-      preamble: function () {
+      preamble: function() {
         const html = `<h3>Correct response: </h3>
                     <p>${jsPsych.timelineVariable("correctResponse")}</p>
                     <img src="${jsPsych.timelineVariable("stimulus")}" width="300" height="300">`;
 
         return html;
       },
-      //preamble: jsPsych.timelineVariable("correctResponse"),
       html: `
     <h3>Log the response</h3>
     <input type="button" value="Correct" onclick="document.getElementById('result').value='Correct';">
@@ -88,10 +85,10 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
       },
     };
     const testProcedure = {
-      timeline: [preload, blankPage, showImg, blankPage, logging, blankPage],
+      timeline: [preload, blankPage, showImg, blankPage, logging,],
       timeline_variables: experiment_stimuli,
       // to reload the experiment_stimuli after one repetition has been completed
-      on_timeline_start: function () {
+      on_timeline_start: function() {
         this.timeline_variables = experiment_stimuli;
       },
     };
@@ -99,12 +96,10 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
 
     const loop_node = {
       timeline: timeline,
-      loop_function: function (data: any) {
+      loop_function: function(data: any) {
         data = data;
         // tracking number of corret answers
         // need to access logging trial info
-        cr = jsPsych.timelineVariable("correctResponse");
-        console.dir(cr);
         if (numberOfTrialsRun < totalNumberOfTrialsToRun) {
           // getting the most recent logged result
           const loggingResponseArray: [] = jsPsych.data
@@ -119,8 +114,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
           } else if (lastTrialResults["result"] === "Incorrect") {
             numberOfCorrectAnswers = 0;
           }
-          // difficulty level logic, 2 correct answers in a row, increase, one incorret answer decrease
-          // not sure this makes sense
+          // difficulty level logic, <x> correct answers in a row, increase, <y> incorret answer decrease
           if (numberOfCorrectAnswers === advancementSchedule) {
             currentDifficultyLevel++;
             // need to reset as difficulty has changed

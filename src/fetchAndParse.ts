@@ -35,6 +35,31 @@ async function fetchAndParse(path: string) {
     console.log(error);
   }
 }
-const imgDB = await fetchAndParse("/data.csv");
-const experimentSettings = await fetchAndParse("/experimentSettings.csv");
-export { imgDB, experimentSettings };
+
+const parsedImageDB = await fetchAndParse("/data.csv");
+if (!parsedImageDB) {
+  throw new Error('Failed to fetch and parse the data.csv.')
+}
+const parsedExperimentSettings = await fetchAndParse("/experimentSettings.csv");
+if (!parsedExperimentSettings) {
+  throw new Error("Failed to fetch and parse experimentSettings.csv.");
+}
+
+interface ImageBank {
+  stimulus: string;
+  difficultyLevel: number;
+  correctResponse: string;
+  language: string;
+}
+
+interface Settings {
+  totalNumberOfTrialsToRun: number | string,
+  advancementSchedule: number | string,
+  regressionSchedule: number | string,
+  language: string,
+}
+
+const experimentSettings: Settings = parsedExperimentSettings.data[0] as Settings
+const imageDB: ImageBank[] = parsedImageDB.data[0] as ImageBank[]
+
+export { imageDB, experimentSettings };

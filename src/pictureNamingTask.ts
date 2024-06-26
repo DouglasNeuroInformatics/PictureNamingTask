@@ -14,20 +14,22 @@ import { experimentSettings } from "./fetchAndParse";
 // a timeline is a set of trials
 // a trial is a single object eg htmlKeyboardResponse etc ...
 const timeline: any[] = [];
+
+// variables for controlling advancementSchedule, regressionSchedule, and when the experiment is 
+// finihsed
 let numberOfCorrectAnswers: number = 0;
 let numberOfTrialsRun: number = 1;
-//let displayDifficultyLevel = ''
-//let displayCorrectResponse = ''
-//
+// dynamically loading user experimentSettings
 let totalNumberOfTrialsToRun = Number(experimentSettings.totalNumberOfTrialsToRun)
 let advancementSchedule = Number(experimentSettings.advancementSchedule)
 let regressionSchedule = Number(experimentSettings.regressionSchedule)
 let language = experimentSettings.language
+
 console.log(
   `Experiment will proceed with totalNumberOfTrialsToRun of ${totalNumberOfTrialsToRun}, an advancementSchedule of ${advancementSchedule}, and a regressionSchedule of ${regressionSchedule}`,
 );
+
 export default function pictureNamingTask(difficultyLevelParam: number) {
-  // setting up the stimuli
   let experiment_stimuli = createStimuli(difficultyLevelParam, language);
   let currentDifficultyLevel: number = difficultyLevelParam;
   if (difficultyLevelParam) {

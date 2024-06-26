@@ -38,9 +38,9 @@ async function fetchAndParse(path: string) {
 
 const parsedImageDB = await fetchAndParse("/data.csv");
 if (!parsedImageDB) {
-  throw new Error('Failed to fetch and parse the data.csv.')
+  throw new Error("Failed to fetch and parse the data.csv.");
 } else {
-  console.table(parsedImageDB)
+  console.table(parsedImageDB);
 }
 const parsedExperimentSettings = await fetchAndParse("/experimentSettings.csv");
 if (!parsedExperimentSettings) {
@@ -55,13 +55,15 @@ interface ImageBank {
 }
 
 interface Settings {
-  totalNumberOfTrialsToRun: number | string,
-  advancementSchedule: number | string,
-  regressionSchedule: number | string,
-  language: string,
+  totalNumberOfTrialsToRun: number | string;
+  advancementSchedule: number | string;
+  regressionSchedule: number | string;
+  language: string;
+  seed: number;
 }
 
-const experimentSettings: Settings = parsedExperimentSettings.data[0] as Settings
-const imageDB: ImageBank[] = parsedImageDB.data as ImageBank[]
+const experimentSettings: Settings = parsedExperimentSettings
+  .data[0] as Settings;
+const imageDB: ImageBank[] = parsedImageDB.data as ImageBank[];
 
 export { imageDB, experimentSettings };

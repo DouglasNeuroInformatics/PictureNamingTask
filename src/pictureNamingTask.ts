@@ -45,7 +45,7 @@ function getRandomElementWithSeed(array: any[]) {
     indiciesSelected.clear();
   }
 
-  while (!foundUnique) {
+  do {
     const [newRandomIndex, newRng] = prand.uniformIntDistribution(
       0,
       array.length - 1,
@@ -58,7 +58,7 @@ function getRandomElementWithSeed(array: any[]) {
       indiciesSelected.add(randomIndex);
       foundUnique = true;
     }
-  }
+  } while (!foundUnique);
 
   console.log("Selected Index:", randomIndex);
   console.log("Selected Indices Set:", indiciesSelected);

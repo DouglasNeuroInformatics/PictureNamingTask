@@ -29,6 +29,7 @@ async function fetchAndParse(path: string) {
 
     const responseText = await response.text();
     const data = Papa.parse(responseText, { header: true });
+    console.log('fetch and parse got data')
     console.log(data);
     return data;
   } catch (error) {

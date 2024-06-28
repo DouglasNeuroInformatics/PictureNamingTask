@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: 'pnt-test',
+  base: '/pnt-test/',
   build: {
     target: 'esnext' //browsers can handle the latest ES features
   },

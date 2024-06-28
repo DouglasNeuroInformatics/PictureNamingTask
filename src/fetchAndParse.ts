@@ -10,6 +10,7 @@ async function fetchAndParse(path: string) {
       method: "GET",
     });
     if (!response.ok) {
+      console.log(response)
       const container = document.createElement(`div`);
       const p = document.createElement("p");
       const msg = document.createElement(`h1`);

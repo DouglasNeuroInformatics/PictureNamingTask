@@ -40,18 +40,17 @@ async function fetchAndParse(path: string) {
     console.log(error);
   }
 }
+const baseUrl = import.meta.env.BASE_URL;
+const dataPath = baseUrl + 'data.csv'
+const experimentSettingsPath = baseUrl + 'experimentSettings.csv'
 
-const parsedImageDB = await fetchAndParse("/data.csv");
+const parsedImageDB = await fetchAndParse(dataPath);
 if (!parsedImageDB) {
   throw new Error("Failed to fetch and parse the data.csv.");
 } else {
   console.table(parsedImageDB);
 }
-const parsedExperimentSettings = await fetchAndParse("/experimentSettings.csv");
-if (!parsedExperimentSettings) {
-  throw new Error("Failed to fetch and parse experimentSettings.csv.");
-}
-
+const parsedExperimentSettings = await fetchAndParse(experimentSettingsPath)
 interface ImageBank {
   stimulus: string;
   difficultyLevel: number;

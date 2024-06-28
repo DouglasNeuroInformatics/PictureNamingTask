@@ -2,6 +2,8 @@ import Papa from "papaparse";
 import "./style.css";
 
 async function fetchAndParse(path: string) {
+  console.log('path')
+  console.log(path)
   try {
     const response = await fetch(path, {
       headers: { Accept: "text/csv" },
@@ -33,6 +35,7 @@ async function fetchAndParse(path: string) {
     console.log(data);
     return data;
   } catch (error) {
+    console.log('error:')
     console.log(error);
   }
 }

@@ -48,9 +48,16 @@ const parsedImageDB = await fetchAndParse(dataPath);
 if (!parsedImageDB) {
   throw new Error("Failed to fetch and parse the data.csv.");
 } else {
+  console.log('parsedImageDB')
   console.table(parsedImageDB);
 }
 const parsedExperimentSettings = await fetchAndParse(experimentSettingsPath)
+if (!parsedExperimentSettings) {
+  throw new Error('Failes to fetch and parse the experimentSettings.csv.')
+} else {
+  console.log('experimentSettings')
+  console.table(parsedExperimentSettings)
+}
 interface ImageBank {
   stimulus: string;
   difficultyLevel: number;

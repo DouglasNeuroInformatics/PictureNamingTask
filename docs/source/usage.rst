@@ -10,6 +10,7 @@ To use PictureNameingTask locally a simple http server can be used. Either downl
 For example using python3 first navitage to the directory containing the index.html file then:
 
 .. code-block:: console
+
 cd path/to/index.html
 python3 -m http.server
 

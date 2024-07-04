@@ -12,7 +12,7 @@ For example using python3 first navitage to the directory containing the index.h
 .. code-block:: console
 
 cd path/to/index.html
-python3 -m http.server
+python3 -m http.server``
 
 Adding stimuli
 ----------------

@@ -1,0 +1,59 @@
+.
+├── data.csv
+├── experimentSettings.csv
+├── level1
+│   ├── addressplate.jpg
+│   ├── bandage.jpg
+│   ├── bowrake.jpg
+│   ├── bracelet04.jpg
+│   └── broccoli01a.jpg
+├── level2
+│   ├── africanelephant.jpg
+│   ├── almond.jpg
+│   ├── bandaid01.jpg
+│   ├── bathtub.jpg
+│   └── belt02a.jpg
+├── level3
+│   ├── acousticguitar02.jpg
+│   ├── apple07.jpg
+│   ├── asparagus.jpg
+│   ├── bagel01.jpg
+│   └── blackbear.jpg
+├── level4
+│   ├── accordion01.jpg
+│   ├── binder03b.jpg
+│   ├── birdnest.jpg
+│   ├── bridge.jpg
+│   └── cactus.jpg
+├── level5
+│   ├── baguette01.jpg
+│   ├── bed.jpg
+│   ├── blackberry.jpg
+│   ├── boatmotor.jpg
+│   └── bowl02a.jpg
+├── level6
+│   ├── ant.jpg
+│   ├── barn.jpg
+│   ├── baseboardheater01.jpg
+│   ├── birdie.jpg
+│   └── bleachers.jpg
+├── level7
+│   ├── aircompressor.jpg
+│   ├── arm.jpg
+│   ├── arugula.jpg
+│   ├── atm.jpg
+│   └── barrel01.jpg
+├── level8
+│   ├── aquarium.jpg
+│   ├── ashtray01.jpg
+│   ├── avcable.jpg
+│   └── axe01.jpg
+├── level9
+│   ├── anchor.jpg
+│   ├── awning.jpg
+│   ├── badmintonracket.jpg
+│   ├── bagofpowder.jpg
+│   └── banana01.jpg
+└── output.txt
+
+10 directories, 47 files

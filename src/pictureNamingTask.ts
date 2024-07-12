@@ -130,6 +130,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     };
     const showImg = {
       type: ImageKeyboardResponsePlugin,
+      stimulus_height: 600,
       stimulus: jsPsych.timelineVariable("stimulus"),
     };
 

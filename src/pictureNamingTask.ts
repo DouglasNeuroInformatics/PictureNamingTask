@@ -217,7 +217,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
         }
       },
     };
-
+    // @ts-ignore
     jsPsych.run([welcome, loop_node]);
   }
 }

@@ -107,7 +107,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   let currentDifficultyLevel: number = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
-      on_finish: function() {
+      on_finish: function () {
         transformAndDownload(jsPsych.data);
       },
     });
@@ -136,10 +136,10 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
 
     const logging = {
       type: SurveyHtmlFormPlugin,
-      preamble: function() {
+      preamble: function () {
         const html = `<h3>Correct response: </h3>
-                    <p>${jsPsych.timelineVariable("correctResponse")}</p>
-                    <img src="${jsPsych.timelineVariable("stimulus")}" width="300" height="300">`;
+                    <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>
+                    <img src="${jsPsych.evaluateTimelineVariable("stimulus")}" width="300" height="300">`;
 
         return html;
       },
@@ -156,15 +156,15 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   `,
       autofocus: "textBox",
       data: {
-        difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
-        correctResponse: jsPsych.timelineVariable("correctResponse"),
+        difficultyLevel: jsPsych.evaluateTimelineVariable("difficultyLevel"),
+        correctResponse: jsPsych.evaluateTimelineVariable("correctResponse"),
       },
     };
     const testProcedure = {
       timeline: [preload, blankPage, showImg, blankPage, logging],
       timeline_variables: experiment_stimuli,
       // to reload the experiment_stimuli after one repetition has been completed
-      on_timeline_start: function() {
+      on_timeline_start: function () {
         this.timeline_variables = experiment_stimuli;
       },
     };
@@ -172,7 +172,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
 
     const loop_node = {
       timeline: timeline,
-      loop_function: function(data: any) {
+      loop_function: function (data: any) {
         data = data;
         // tracking number of corret answers
         // need to access logging trial info

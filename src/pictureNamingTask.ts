@@ -152,8 +152,9 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     <input type="text" id="result" name="result" readonly>
     <hr>
     <input type="text" id="textBox" name="notes" placeholder="Log any other notes here">
-    <p>Press any key to submit the response and continue</p>
+    <p>Log response and press submit to continue</p>
   `,
+      button_label: "Submit",
       autofocus: "textBox",
       data: {
         difficultyLevel: jsPsych.evaluateTimelineVariable("difficultyLevel"),

@@ -14,7 +14,7 @@ import i18n from "./services/i18n.ts";
  *
  *
  */
-
+i18n.init;
 const welcomeText = i18n.t("welcome");
 console.log("++++++++++++++");
 console.log(welcomeText);
@@ -31,6 +31,8 @@ let totalNumberOfTrialsToRun = Number(
 );
 let advancementSchedule = Number(experimentSettings.advancementSchedule);
 let regressionSchedule = Number(experimentSettings.regressionSchedule);
+// add logic to initialize with initialDifficulty
+// let intialDifficulty = Number(experimentSettings.initialDifficulty);
 let language = experimentSettings.language;
 let seed = experimentSettings.seed;
 
@@ -124,7 +126,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
 
     const welcome = {
       type: HtmlKeyboardResponsePlugin,
-      stimulus: `welcome`,
+      stimulus: `${welcomeText}`,
     };
 
     const preload = {

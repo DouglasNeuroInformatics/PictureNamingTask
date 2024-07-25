@@ -18,6 +18,8 @@
     "@jspsych/plugin-survey-html-form": "^2.0.0",
     "@jspsych/plugin-survey-text": "^2.0.0",
     "@types/node": "^20.14.12",
+    "i18next": "^23.12.2",
+    "i18next-http-backend": "^2.5.2",
     "jspsych": "^8.0.1",
     "papaparse": "^5.4.1",
     "pure-rand": "^6.1.0",

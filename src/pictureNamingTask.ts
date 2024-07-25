@@ -8,6 +8,16 @@ import { transformAndDownload } from "./dataMunger";
 import { experimentSettings } from "./fetchAndParse";
 import { imageDB } from "./fetchAndParse";
 import prand from "pure-rand";
+import i18n from "./services/i18n.ts";
+/*
+ * Translations
+ *
+ *
+ */
+
+const welcomeText = i18n.t("welcome");
+console.log("++++++++++++++");
+console.log(welcomeText);
 //****************************
 //****EXPERIMENT_SETTINGS*****
 //****************************
@@ -114,7 +124,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
 
     const welcome = {
       type: HtmlKeyboardResponsePlugin,
-      stimulus: "Welcome. Press any key to begin",
+      stimulus: `welcome`,
     };
 
     const preload = {

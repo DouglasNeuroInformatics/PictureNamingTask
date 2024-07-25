@@ -1,9 +1,4 @@
-// write a fuction to fetch the .csv,
-//
-// aysnc funv with a try catch
-//
-// h
-//
 import pictureNamingTask from "./pictureNamingTask";
+import { experimentSettings } from "./fetchAndParse";
 
-pictureNamingTask(1);
+pictureNamingTask(Number(experimentSettings.initialDifficulty));

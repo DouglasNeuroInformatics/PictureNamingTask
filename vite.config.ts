@@ -5,6 +5,6 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: process.env.VITE_BASE || '/',
   build: {
-    target: 'esnext' //browsers can handle the latest ES features
+    target: 'es2022' //browsers can handle the latest ES features
   },
 },)

@@ -7,5 +7,6 @@
   "incorrect": "Incorrect",
   "responseWas": "The response was:",
   "logNotes": "Log any other notes here",
-  "logResponseToContinue": "Log response and press submit to continue"
+  "logResponseToContinue": "Log response and press submit to continue",
+  "submit": "Submit"
 }

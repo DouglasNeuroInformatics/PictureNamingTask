@@ -7,5 +7,6 @@
   "incorrect": "Incorrect",
   "responseWas": "La réponse a été donnée:",
   "logNotes": "Inscrivez ici toute autre note",
-  "logResponseToContinue": "Enregistrez la réponse et appuyez sur 'soumettre' pour continuer"
+  "logResponseToContinue": "Enregistrez la réponse et appuyez sur 'soumettre' pour continuer",
+  "submit":"Soumettre"
 }

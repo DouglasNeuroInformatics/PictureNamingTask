@@ -1,13 +1,13 @@
-export function dataMunger(data: any) {
+function dataMunger(data: any) {
   //console.table(data.get());
 
-  const rows = data
+  const rows: Record<string, any>[] = data
     .get()
     .filter({ trial_type: "survey-html-form" })
     .json()
     .split("\n");
   //console.table(rows);
-  const experimentResults = [];
+  const experimentResults: Record<string, any>[] = [];
 
   for (let row of rows) {
     row = JSON.parse(row);
@@ -32,7 +32,7 @@ export function dataMunger(data: any) {
   return experimentResults;
 }
 
-function arrayToCSV(array: any[]) {
+function arrayToCSV(array) {
   console.log(`array ${array}`)
   const header = Object.keys(array[0]).join(",");
 
@@ -45,7 +45,7 @@ function arrayToCSV(array: any[]) {
   return `${header}\n${rows}`;
 }
 
-function downloadCSV(dataForCSV: any, filename: string) {
+function downloadCSV(dataForCSV: string, filename: string) {
   const blob = new Blob([dataForCSV], { type: "text/csv;charset=utf8" });
   console.log('blob')
   console.table(blob)
@@ -58,7 +58,7 @@ function downloadCSV(dataForCSV: any, filename: string) {
   document.body.removeChild(link);
 }
 
-export function transformAndDownload(data: any) {
+export function transformAndDownload(data) {
   const mungedData = dataMunger(data);
   console.log(`mungedData ${mungedData}`);
   console.table(mungedData);

@@ -48,6 +48,9 @@ importers:
         specifier: ^6.1.0
         version: 6.1.0
     devDependencies:
+      '@douglasneuroinformatics/tsconfig':
+        specifier: ^1.0.1
+        version: 1.0.1(typescript@5.5.4)
       '@types/papaparse':
         specifier: ^5.3.14
         version: 5.3.14
@@ -72,6 +75,11 @@ packages:
   '@babel/runtime@7.24.8':
     resolution: {integrity: sha512-5F7SDGs1T72ZczbRwbGO9lQi0NLjQxzl6i4lJxLxfW9U5UluCSyEJeniWvnhl3/euNiqQVbo8zruhsDfid0esA==}
     engines: {node: '>=6.9.0'}
+
+  '@douglasneuroinformatics/tsconfig@1.0.1':
+    resolution: {integrity: sha512-lS49lCenQwEgwKw60DBONp6TCRd6VQWaw3m4UdUEopXbdBx2kfbMdeB0zRkSV+RgghhoBHYpVod2JmjJS37NsA==}
+    peerDependencies:
+      typescript: ^5.4.3
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -970,6 +978,10 @@ snapshots:
   '@babel/runtime@7.24.8':
     dependencies:
       regenerator-runtime: 0.14.1
+
+  '@douglasneuroinformatics/tsconfig@1.0.1(typescript@5.5.4)':
+    dependencies:
+      typescript: 5.5.4
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true

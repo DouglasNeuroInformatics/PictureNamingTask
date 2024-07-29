@@ -106,7 +106,8 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
       on_finish: function() {
-        transformAndDownload(jsPsych.data);
+        const data = jsPsych.data.get()
+        transformAndDownload(data);
       },
     });
 
@@ -155,8 +156,9 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
       button_label: i18n.t("submit"),
       autofocus: "textBox",
       data: {
-        difficultyLevel: jsPsych.evaluateTimelineVariable("difficultyLevel"),
-        correctResponse: jsPsych.evaluateTimelineVariable("correctResponse"),
+        difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
+        correctResponse: jsPsych.timelineVariable("correctResponse"),
+        language: jsPsych.timelineVariable("language")
       },
     };
     const testProcedure = {

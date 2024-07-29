@@ -1,54 +1,58 @@
-function dataMunger(data: any) {
-  //console.table(data.get());
+import { DataCollection } from "jspsych"
 
-  const rows: Record<string, any>[] = data
-    .get()
+interface Response {
+  notes: string
+  result: string
+}
+
+interface Trial {
+  trialType: string
+}
+
+interface LoggingTrial extends Trial {
+  rt: number
+  response: Response
+  stimulus: string
+  correctResponse: string
+  difficultyLevel: string
+  language: string
+}
+
+interface ExperimentResults extends Omit<LoggingTrial, 'response' | 'trialType'> {
+  responseNotes: string;
+  responseResult: string;
+}
+
+function dataMunger(data: DataCollection) {
+  const rows: LoggingTrial[] = data
     .filter({ trial_type: "survey-html-form" })
-    .json()
-    .split("\n");
-  //console.table(rows);
-  const experimentResults: Record<string, any>[] = [];
+    .values()
 
+  const experimentResults: ExperimentResults[] = [];
   for (let row of rows) {
-    row = JSON.parse(row);
-    console.log("row");
-    console.log(row);
-    for (const element of row) {
-      console.log("element");
-      console.log(element);
-      const rt = element["rt"];
-      const result = element["response"]["result"];
-      const notes = element["response"]["notes"];
-      const correctResponse = element["correctResponse"];
-      const stimulus = element["stimulus"];
-      const difficultyLevel = element['difficultyLevel']
-      console.log(`rt ${rt}`);
-      experimentResults.push({ rt, result, notes, stimulus, correctResponse, difficultyLevel });
-    }
+    experimentResults.push({
+      rt: row.rt,
+      responseNotes: row.response.notes,
+      responseResult: row.response.result,
+      stimulus: row.stimulus,
+      correctResponse: row.correctResponse,
+      difficultyLevel: row.difficultyLevel,
+      language: row.language
+    });
   }
-  console.log('exp res')
-  console.log(experimentResults)
-  console.table(experimentResults);
   return experimentResults;
 }
 
-function arrayToCSV(array) {
-  console.log(`array ${array}`)
+function arrayToCSV(array: ExperimentResults[]) {
   const header = Object.keys(array[0]).join(",");
-
-  console.log(`header ${header}`)
   const rows = array
     .map((row) => Object.values(row).join(","))
     .join("\n");
-  console.log(`rows, ${rows}`)
-  console.log("%%%%%%%%%%%")
   return `${header}\n${rows}`;
 }
 
 function downloadCSV(dataForCSV: string, filename: string) {
   const blob = new Blob([dataForCSV], { type: "text/csv;charset=utf8" });
-  console.log('blob')
-  console.table(blob)
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
@@ -57,18 +61,22 @@ function downloadCSV(dataForCSV: string, filename: string) {
   link.click();
   document.body.removeChild(link);
 }
+function getLocalTime() {
+  const localTime = new Date();
 
-export function transformAndDownload(data) {
+  const year = localTime.getFullYear();
+  // months start at 0 so add 1
+  const month = String(localTime.getMonth() + 1).padStart(2, '0');
+  const day = String(localTime.getDate()).padStart(2, '0');
+  const hours = String(localTime.getHours()).padStart(2, '0');
+  const minutes = String(localTime.getMinutes()).padStart(2, '0');
+  const seconds = String(localTime.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+}
+export function transformAndDownload(data: DataCollection) {
   const mungedData = dataMunger(data);
-  console.log(`mungedData ${mungedData}`);
-  console.table(mungedData);
   const dataForCSV = arrayToCSV(mungedData);
-  console.log(`dataForCSV ${dataForCSV}`);
-  console.table(dataForCSV);
-  // no timezone offset
-  const currentDate = String(
-    new Date().toJSON().slice(0, 19).replace(/T/g, "-"),
-  );
+  const currentDate = getLocalTime()
   downloadCSV(dataForCSV, `${currentDate}.csv`);
-  console.table(dataForCSV);
 }

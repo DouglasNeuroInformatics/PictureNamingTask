@@ -1,32 +1,32 @@
 import { DataCollection } from "jspsych";
 
-type Response = {
+export type ParticipantResponse = {
   notes: string;
   result: string;
-}
+};
 
-type Trial = {
+export type Trial = {
   trialType: string;
-}
+};
 
-type LoggingTrial = {
+export type LoggingTrial = {
   correctResponse: string;
   difficultyLevel: string;
   language: string;
-  response: Response;
+  response: ParticipantResponse;
   rt: number;
   stimulus: string;
-} & Trial
+} & Trial;
 
 type ExperimentResults = {
   responseNotes: string;
   responseResult: string;
-} & Omit<LoggingTrial, "response" | "trialType">
+} & Omit<LoggingTrial, "response" | "trialType">;
 
 function dataMunger(data: DataCollection) {
-  const trials: LoggingTrial[] = data
+  const trials = data
     .filter({ trial_type: "survey-html-form" })
-    .values();
+    .values() as LoggingTrial[];
 
   const experimentResults: ExperimentResults[] = [];
   for (let trial of trials) {

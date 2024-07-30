@@ -10,11 +10,16 @@ import { experimentSettings } from "./fetchAndParse";
 import { imageDB } from "./fetchAndParse";
 import i18n from "./services/i18n";
 
+import type { LoggingTrial } from "./dataMunger";
+import type { ParticipantResponse } from "./dataMunger";
+import type { ExperimentImage } from "./fetchAndParse";
+
 import "jspsych/css/jspsych.css";
+
 /*
  * Translations
  */
-i18n.init;
+void i18n.init;
 
 //****************************
 //****EXPERIMENT_SETTINGS*****
@@ -42,7 +47,7 @@ const indiciesSelected = new Set();
 let rng = prand.xoroshiro128plus(seed);
 
 // closure
-function getRandomElementWithSeed(array: any[]) {
+function getRandomElementWithSeed(array: ExperimentImage[]): ExperimentImage[] {
   let randomIndex: number;
   let foundUnique = false;
 
@@ -66,7 +71,8 @@ function getRandomElementWithSeed(array: any[]) {
     }
   } while (!foundUnique);
 
-  return [array[randomIndex]];
+  const result = [array[randomIndex]!];
+  return result;
 }
 
 // draw an image at random from the bank depending on the difficulty_level selected
@@ -75,18 +81,16 @@ function createStimuli(
   difficultyLevel: number,
   language: string,
   clearSet: boolean,
-) {
+): ExperimentImage[] {
   if (clearSet === true) {
     indiciesSelected.clear();
   }
-  let imgList = imageDB;
+  let imgList: ExperimentImage[] = imageDB;
   imgList = imgList.filter(
-    (image: any) =>
+    (image) =>
       Number(image.difficultyLevel) === difficultyLevel &&
       image.language === language,
   );
-  console.log("filtered");
-  console.log(imgList);
   let result = getRandomElementWithSeed(imgList);
   return result;
 }
@@ -96,7 +100,8 @@ function createStimuli(
 //****************************
 // a timeline is a set of trials
 // a trial is a single object eg htmlKeyboardResponse etc ...
-const timeline: any[] = [];
+// @ts-expect-error the trials have different structures
+const timeline = [];
 export default function pictureNamingTask(difficultyLevelParam: number) {
   let experiment_stimuli = createStimuli(difficultyLevelParam, language, false);
   let currentDifficultyLevel = difficultyLevelParam;
@@ -178,11 +183,13 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
           return false;
         }
         // getting the most recent logged result
-        const loggingResponseArray: [] = jsPsych.data
+        const loggingResponseArray = jsPsych.data
           .get()
-          .filter({ trial_type: "survey-html-form" }).trials;
+          // @ts-expect-error .trials is private to DataCollection
+          .filter({ trial_type: "survey-html-form" }).trials as LoggingTrial[];
         const lastTrialIndex = loggingResponseArray.length - 1;
-        const lastTrialResults =
+
+        const lastTrialResults: ParticipantResponse =
           loggingResponseArray[lastTrialIndex]!.response;
 
         if (lastTrialResults.result === "Correct") {
@@ -208,11 +215,11 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
           clearSet,
         );
         numberOfTrialsRun++;
-        console.log(`numberOfTrialsRun: ${numberOfTrialsRun}`);
         return true;
       },
+      //@ts-expect-error timeline contains trials of different structures
       timeline,
     };
-    jsPsych.run([welcome, loop_node]);
+    void jsPsych.run([welcome, loop_node]);
   }
 }

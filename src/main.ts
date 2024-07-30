@@ -1,5 +1,3 @@
-import Papa from "papaparse";
-
 import pictureNamingTask from "./pictureNamingTask";
 
 async function checkFilesExists(baseUrl: string, filePath: string) {
@@ -11,7 +9,6 @@ async function checkFilesExists(baseUrl: string, filePath: string) {
     });
 
     if (!response.ok) {
-      console.log(response);
       const container = document.createElement(`div`);
       const p = document.createElement("p");
       const msg = document.createElement(`h1`);
@@ -32,11 +29,12 @@ async function checkFilesExists(baseUrl: string, filePath: string) {
     }
     return true;
   } catch (error) {
+    console.error(error);
     return false;
   }
 }
 // Immediatly invoked function expresssion to check files exist
-(async () => {
+void (async () => {
   const baseUrl = import.meta.env.BASE_URL || "/";
   const dataPath = "data.csv";
   const experimentSettingsPath = "experimentSettings.csv";
@@ -55,6 +53,6 @@ async function checkFilesExists(baseUrl: string, filePath: string) {
   }
 
   if (parsedImageDB && parsedExperimentSettings) {
-    //pictureNamingTask(1);
+    pictureNamingTask(1);
   }
 })();

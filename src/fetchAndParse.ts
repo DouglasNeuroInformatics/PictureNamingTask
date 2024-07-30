@@ -2,12 +2,12 @@ import Papa from "papaparse";
 
 import "./style.css";
 
-type ImageBank = {
+export type ExperimentImage = {
   correctResponse: string;
   difficultyLevel: number;
   language: string;
   stimulus: string;
-}
+};
 
 type Settings = {
   advancementSchedule: number | string;
@@ -16,11 +16,9 @@ type Settings = {
   regressionSchedule: number | string;
   seed: number;
   totalNumberOfTrialsToRun: number | string;
-}
+};
 
 async function fetchAndParse(path: string) {
-  console.log("path");
-  console.log(path);
   //  try {
   const response = await fetch(path, {
     headers: { Accept: "text/csv" },
@@ -49,31 +47,16 @@ async function fetchAndParse(path: string) {
 
   const responseText = await response.text();
   const data = Papa.parse(responseText, { header: true });
-  console.log("fetch and parse got data");
-  console.log(data);
   return data;
 }
+
+// TODO: new new URL ...
 const baseUrl = import.meta.env.BASE_URL;
-console.log(`BaseUrl: ${baseUrl}`);
 const dataPath = baseUrl + "data.csv";
 const experimentSettingsPath = baseUrl + "experimentSettings.csv";
-
 const parsedImageDB = await fetchAndParse(dataPath);
-if (!parsedImageDB) {
-  throw new Error("Failed to fetch and parse the data.csv.");
-} else {
-  console.log("parsedImageDB");
-  console.table(parsedImageDB);
-}
 const parsedExperimentSettings = await fetchAndParse(experimentSettingsPath);
-if (!parsedExperimentSettings) {
-  throw new Error("Failes to fetch and parse the experimentSettings.csv.");
-} else {
-  console.log("experimentSettings");
-  console.table(parsedExperimentSettings);
-}
-
 const experimentSettings = parsedExperimentSettings.data[0] as Settings;
-const imageDB = parsedImageDB.data as ImageBank[];
+const imageDB = parsedImageDB.data as ExperimentImage[];
 
 export { experimentSettings, imageDB };

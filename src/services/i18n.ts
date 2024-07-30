@@ -3,7 +3,6 @@ import Backend from "i18next-http-backend";
 
 import { experimentSettings } from "../fetchAndParse";
 
-console.log(experimentSettings.language);
 await i18n.use(Backend).init({
   backend: {
     loadPath: "/locales/{{lng}}/{{ns}}.json",

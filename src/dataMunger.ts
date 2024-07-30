@@ -1,54 +1,54 @@
-import { DataCollection } from "jspsych"
+import { DataCollection } from "jspsych";
 
-interface Response {
-  notes: string
-  result: string
+type Response = {
+  notes: string;
+  result: string;
 }
 
-interface Trial {
-  trialType: string
+type Trial = {
+  trialType: string;
 }
 
-interface LoggingTrial extends Trial {
-  rt: number
-  response: Response
-  stimulus: string
-  correctResponse: string
-  difficultyLevel: string
-  language: string
-}
+type LoggingTrial = {
+  correctResponse: string;
+  difficultyLevel: string;
+  language: string;
+  response: Response;
+  rt: number;
+  stimulus: string;
+} & Trial
 
-interface ExperimentResults extends Omit<LoggingTrial, 'response' | 'trialType'> {
+type ExperimentResults = {
   responseNotes: string;
   responseResult: string;
-}
+} & Omit<LoggingTrial, "response" | "trialType">
 
 function dataMunger(data: DataCollection) {
-  const rows: LoggingTrial[] = data
+  const trials: LoggingTrial[] = data
     .filter({ trial_type: "survey-html-form" })
-    .values()
+    .values();
 
   const experimentResults: ExperimentResults[] = [];
-  for (let row of rows) {
+  for (let trial of trials) {
     experimentResults.push({
-      rt: row.rt,
-      responseNotes: row.response.notes,
-      responseResult: row.response.result,
-      stimulus: row.stimulus,
-      correctResponse: row.correctResponse,
-      difficultyLevel: row.difficultyLevel,
-      language: row.language
+      correctResponse: trial.correctResponse,
+      difficultyLevel: trial.difficultyLevel,
+      language: trial.language,
+      responseNotes: trial.response.notes,
+      responseResult: trial.response.result,
+      rt: trial.rt,
+      stimulus: trial.stimulus,
     });
   }
   return experimentResults;
 }
 
 function arrayToCSV(array: ExperimentResults[]) {
-  const header = Object.keys(array[0]).join(",");
-  const rows = array
-    .map((row) => Object.values(row).join(","))
+  const header = Object.keys(array[0]!).join(",");
+  const trials = array
+    .map((trial) => Object.values(trial).join(","))
     .join("\n");
-  return `${header}\n${rows}`;
+  return `${header}\n${trials}`;
 }
 
 function downloadCSV(dataForCSV: string, filename: string) {
@@ -66,17 +66,17 @@ function getLocalTime() {
 
   const year = localTime.getFullYear();
   // months start at 0 so add 1
-  const month = String(localTime.getMonth() + 1).padStart(2, '0');
-  const day = String(localTime.getDate()).padStart(2, '0');
-  const hours = String(localTime.getHours()).padStart(2, '0');
-  const minutes = String(localTime.getMinutes()).padStart(2, '0');
-  const seconds = String(localTime.getSeconds()).padStart(2, '0');
+  const month = String(localTime.getMonth() + 1).padStart(2, "0");
+  const day = String(localTime.getDate()).padStart(2, "0");
+  const hours = String(localTime.getHours()).padStart(2, "0");
+  const minutes = String(localTime.getMinutes()).padStart(2, "0");
+  const seconds = String(localTime.getSeconds()).padStart(2, "0");
 
   return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
 }
 export function transformAndDownload(data: DataCollection) {
   const mungedData = dataMunger(data);
   const dataForCSV = arrayToCSV(mungedData);
-  const currentDate = getLocalTime()
+  const currentDate = getLocalTime();
   downloadCSV(dataForCSV, `${currentDate}.csv`);
 }

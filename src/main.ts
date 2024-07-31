@@ -1,3 +1,4 @@
+import { experimentSettings } from "./fetchAndParse";
 import pictureNamingTask from "./pictureNamingTask";
 
 async function checkFilesExists(baseUrl: string, filePath: string) {
@@ -35,6 +36,9 @@ async function checkFilesExists(baseUrl: string, filePath: string) {
   }
 }
 // Immediatly invoked function expresssion to check files exist
+// and then start pictureNamingTask
+//
+//
 void (async () => {
   const baseUrl = import.meta.env.BASE_URL || "/";
   const dataPath = "data.csv";
@@ -52,8 +56,8 @@ void (async () => {
   if (!parsedExperimentSettings) {
     throw new Error("Failed to fetch and parse the experimentSettings.csv.");
   }
-
   if (parsedImageDB && parsedExperimentSettings) {
-    pictureNamingTask(1);
+    const difficultyLevel = parseFloat(experimentSettings.initialDifficulty);
+    pictureNamingTask(difficultyLevel);
   }
 })();

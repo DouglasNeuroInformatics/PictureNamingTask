@@ -15,17 +15,10 @@ import type { ParticipantResponse } from "./dataMunger";
 import type { ExperimentImage } from "./fetchAndParse";
 
 import "jspsych/css/jspsych.css";
-
-/*
- * Translations
- */
-void i18n.init;
-
 //****************************
 //****EXPERIMENT_SETTINGS*****
 //****************************
 // variables for controlling advancementSchedule, regressionSchedule, and when the experiment is
-// finishe
 let numberOfCorrectAnswers = 0;
 let numberOfTrialsRun = 1;
 const totalNumberOfTrialsToRun = Number(
@@ -39,7 +32,7 @@ let { language, seed } = experimentSettings;
 
 /*
 functions for generating
-experiment_stimuli
+experimentStimuli
 */
 
 const indiciesSelected = new Set();
@@ -102,7 +95,7 @@ function createStimuli(
 // @ts-expect-error the trials have different structures
 const timeline = [];
 export default function pictureNamingTask(difficultyLevelParam: number) {
-  let experiment_stimuli = createStimuli(difficultyLevelParam, language, false);
+  let experimentStimuli = createStimuli(difficultyLevelParam, language, false);
   let currentDifficultyLevel = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
@@ -163,12 +156,12 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
       type: SurveyHtmlFormPlugin,
     };
     const testProcedure = {
-      // to reload the experiment_stimuli after one repetition has been completed
+      // to reload the experimentStimuli after one repetition has been completed
       on_timeline_start: function () {
-        this.timeline_variables = experiment_stimuli;
+        this.timeline_variables = experimentStimuli;
       },
       timeline: [preload, blankPage, showImg, blankPage, logging],
-      timeline_variables: experiment_stimuli,
+      timeline_variables: experimentStimuli,
     };
     timeline.push(testProcedure);
 
@@ -208,7 +201,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
             currentDifficultyLevel--;
           }
         }
-        experiment_stimuli = createStimuli(
+        experimentStimuli = createStimuli(
           currentDifficultyLevel,
           language,
           clearSet,

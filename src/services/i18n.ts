@@ -9,13 +9,8 @@ await i18n.use(Backend).init({
   },
   defaultNS: "translation",
   fallbackLng: "en",
-  // initImmediate: true,
   lng: experimentSettings.language,
   ns: ["translation"],
   preload: ["en", "fr"],
 });
-// this will only work if initImmediate is set to false, because it's async
-//console.log("**** i18n init");
-//console.log(i18n.t("welcome"));
-//console.log(i18n.t("welcome", { lng: "fr" }));
 export default i18n;

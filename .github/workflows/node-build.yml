@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ['main','dev']
+    branches: ["main", "dev"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -27,7 +27,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Setup PNPM
@@ -35,8 +34,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          cache: 'pnpm'
-          node-version-file: '.nvmrc'
+          cache: "pnpm"
+          node-version-file: ".nvmrc"
       - run: pnpm build
         env:
           VITE_BASE: /PictureNamingTask/

@@ -26,6 +26,7 @@ async function checkFilesExists(baseUrl: string, filePath: string) {
           "Please ensure a .csv file named experimentSettings.csv is placed in the same directory as this application is being run from";
         msg.textContent = `"experimentSettings.csv" file not found`;
       }
+      return false;
     }
     return true;
   } catch (error) {

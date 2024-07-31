@@ -25,8 +25,7 @@ void i18n.init;
 //****EXPERIMENT_SETTINGS*****
 //****************************
 // variables for controlling advancementSchedule, regressionSchedule, and when the experiment is
-// finished
-
+// finishe
 let numberOfCorrectAnswers = 0;
 let numberOfTrialsRun = 1;
 const totalNumberOfTrialsToRun = Number(

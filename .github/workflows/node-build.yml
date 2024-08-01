@@ -39,7 +39,7 @@ jobs:
       - run: pnpm install
       - run: pnpm build
         env:
-          VITE_BASE: /PictureNamingTask/
+          VITE_BASE: https://douglasneuroinformatics.github.io/PictureNamingTask/
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact

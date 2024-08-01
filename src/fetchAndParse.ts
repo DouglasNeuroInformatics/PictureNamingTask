@@ -30,19 +30,9 @@ async function fetchAndParse(path: string) {
 }
 
 const baseUrl = import.meta.env.BASE_URL;
-let dataPath: string;
-let experimentSettingsPath: string;
-if (baseUrl === "/") {
-  dataPath = baseUrl + "data.csv";
-  experimentSettingsPath = baseUrl + "experimentSettings.csv";
-} else {
-  console.log(baseUrl);
-  dataPath = new URL("data.csv", baseUrl).toString();
-  experimentSettingsPath = new URL(
-    "experimentSettings.csv",
-    baseUrl,
-  ).toString();
-}
+
+const dataPath = baseUrl + "data.csv";
+const experimentSettingsPath = baseUrl + "experimentSettings.csv";
 
 const parsedImageDB = await fetchAndParse(dataPath);
 const parsedExperimentSettings = await fetchAndParse(experimentSettingsPath);

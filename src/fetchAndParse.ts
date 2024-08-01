@@ -19,7 +19,7 @@ type Settings = {
 };
 
 async function fetchAndParse(path: string) {
-  //  try {
+  // main.ts has logic to make sure the files exist
   const response = await fetch(path, {
     headers: { Accept: "text/csv" },
     method: "GET",
@@ -29,10 +29,20 @@ async function fetchAndParse(path: string) {
   return data;
 }
 
-// TODO: new new URL ...
 const baseUrl = import.meta.env.BASE_URL;
-const dataPath = baseUrl + "data.csv";
-const experimentSettingsPath = baseUrl + "experimentSettings.csv";
+let dataPath: string;
+let experimentSettingsPath: string;
+if (baseUrl === "/") {
+  dataPath = baseUrl + "data.csv";
+  experimentSettingsPath = baseUrl + "experimentSettings.csv";
+} else {
+  dataPath = new URL("data.csv", baseUrl).toString();
+  experimentSettingsPath = new URL(
+    "experimentSettings.csv",
+    baseUrl,
+  ).toString();
+}
+
 const parsedImageDB = await fetchAndParse(dataPath);
 const parsedExperimentSettings = await fetchAndParse(experimentSettingsPath);
 const experimentSettings = parsedExperimentSettings.data[0] as Settings;

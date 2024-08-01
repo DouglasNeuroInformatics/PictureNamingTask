@@ -27,26 +27,27 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v3
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          cache: "pnpm"
-          node-version-file: ".nvmrc"
-      - run: pnpm install
-      - run: pnpm build
-        env:
-          VITE_BASE: https://douglasneuroinformatics.github.io/PictureNamingTask/
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload dist folder
-          path: "./dist"
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+R   steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
+  - name: Setup PNPM
+    uses: pnpm/action-setup@v3
+  - name: Setup Node
+    uses: actions/setup-node@v4
+    with:
+      cache: "pnpm"
+      node-version-file: ".nvmrc"
+  - run: pnpm install
+  - run: pnpm build
+    env:
+      VITE_BASE: /PictureNamingTask/
+  - name: Setup Pages
+    uses: actions/configure-pages@v4
+  - name: Upload artifact
+    uses: actions/upload-pages-artifact@v3
+    with:
+      # Upload dist folder
+      path: "./dist"
+  - name: Deploy to GitHub Pages
+    id: deployment
+    uses: actions/deploy-pages@v4

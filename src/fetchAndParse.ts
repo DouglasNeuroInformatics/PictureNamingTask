@@ -36,6 +36,7 @@ if (baseUrl === "/") {
   dataPath = baseUrl + "data.csv";
   experimentSettingsPath = baseUrl + "experimentSettings.csv";
 } else {
+  console.log(baseUrl);
   dataPath = new URL("data.csv", baseUrl).toString();
   experimentSettingsPath = new URL(
     "experimentSettings.csv",

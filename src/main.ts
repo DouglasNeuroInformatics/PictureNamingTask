@@ -38,12 +38,6 @@ async function checkFilesExists(baseUrl: string, filePath: string) {
 void (async () => {
   const baseUrl = import.meta.env.BASE_URL || "/";
   const dataPath = "data.csv";
-  let testUrl: string;
-  if (import.meta.env.BASE_URL === "/") {
-    testUrl = "/file.csv";
-  } else {
-    testUrl = new URL("file.csv", import.meta.env.BASE_URL).href;
-  }
 
   const experimentSettingsPath = "experimentSettings.csv";
 

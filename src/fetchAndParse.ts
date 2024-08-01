@@ -19,6 +19,7 @@ type Settings = {
 };
 
 async function fetchAndParse(path: string) {
+  //  try {
   const response = await fetch(path, {
     headers: { Accept: "text/csv" },
     method: "GET",
@@ -36,4 +37,5 @@ const parsedImageDB = await fetchAndParse(dataPath);
 const parsedExperimentSettings = await fetchAndParse(experimentSettingsPath);
 const experimentSettings = parsedExperimentSettings.data[0] as Settings;
 const imageDB = parsedImageDB.data as ExperimentImage[];
+
 export { experimentSettings, imageDB };

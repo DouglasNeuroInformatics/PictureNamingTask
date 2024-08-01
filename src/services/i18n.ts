@@ -13,4 +13,6 @@ await i18n.use(Backend).init({
   ns: ["translation"],
   preload: ["en", "fr"],
 });
+
+await i18n.changeLanguage(i18n.resolvedLanguage);
 export default i18n;

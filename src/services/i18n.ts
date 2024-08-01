@@ -2,10 +2,12 @@ import i18n from "i18next";
 import Backend from "i18next-http-backend";
 
 import { experimentSettings } from "../fetchAndParse";
+//@ts-expect-error the baseUrl is being read in the loadPath
+const baseUrl = import.meta.env.BASE_URL | "";
 
 await i18n.use(Backend).init({
   backend: {
-    loadPath: "/locales/{{lng}}/{{ns}}.json",
+    loadPath: "{baseUrl}/locales/{{lng}}/{{ns}}.json",
   },
   defaultNS: "translation",
   fallbackLng: "en",

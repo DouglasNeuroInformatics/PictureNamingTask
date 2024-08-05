@@ -13,6 +13,7 @@ type Settings = {
   advancementSchedule: number;
   initialDifficulty: number;
   language: string;
+  numberOfLevels: number;
   regressionSchedule: number;
   seed: number;
   totalNumberOfTrialsToRun: number;

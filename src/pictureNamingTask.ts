@@ -6,6 +6,8 @@ import DOMPurify from "dompurify";
 import { initJsPsych } from "jspsych";
 import prand from "pure-rand";
 
+import loggingHtml from './assets/loggingHtml.txt?raw'
+
 import { transformAndDownload } from "./dataMunger";
 import { experimentSettings } from "./fetchAndParse";
 import { imageDB } from "./fetchAndParse";
@@ -86,6 +88,21 @@ function createStimuli(
   return result;
 }
 
+
+
+// ********************
+// Sanitize the HTML content from the loggingHtml.txt file
+let sanitizedHtml = DOMPurify.sanitize(loggingHtml);
+
+sanitizedHtml = sanitizedHtml
+  .replace(/\${i18n.t\("logResponse"\)}/g, DOMPurify.sanitize(i18n.t("logResponse")))
+  .replace(/\${i18n.t\("correct"\)}/g, DOMPurify.sanitize(i18n.t("correct")))
+  .replace(/\${i18n.t\("incorrect"\)}/g, DOMPurify.sanitize(i18n.t("incorrect")))
+  .replace(/\${i18n.t\("responseWas"\)}/g, DOMPurify.sanitize(i18n.t("responseWas")))
+  .replace(/\${i18n.t\("logResponseToContinue"\)}/g, DOMPurify.sanitize(i18n.t("logResponseToContinue")));
+
+
+
 //****************************
 //********EXPERIMENT**********
 //****************************
@@ -98,7 +115,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   let currentDifficultyLevel = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
-      on_finish: function () {
+      on_finish: function() {
         const data = jsPsych.data.get();
         transformAndDownload(data);
       },
@@ -134,18 +151,9 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
         difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
         language: jsPsych.timelineVariable("language"),
       },
-      html: `
-    <h3>${i18n.t("logResponse")}</h3>
-    <input type="button" value="${i18n.t("correct")}" onclick="document.getElementById('result').value='${i18n.t("correct")}';">
-    <input type="button" value="${i18n.t("incorrect")}" onclick="document.getElementById('result').value='${i18n.t("incorrect")}';">
-    <br>
-    <label for="result">${i18n.t("responseWas")}</label>
-    <input type="text" id="result" name="result" readonly>
-    <hr>
-    <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
-    <p>${i18n.t("logResponseToContinue")}</p>
-  `,
-      preamble: function () {
+      html: sanitizedHtml
+      ,
+      preamble: function() {
         const html = `<h3>${i18n.t("correctResponse")}</h3>
                     <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>
                     <img src="${jsPsych.evaluateTimelineVariable("stimulus")}" width="300" height="300">`;
@@ -155,7 +163,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     };
     const testProcedure = {
       // to reload the experimentStimuli after one repetition has been completed
-      on_timeline_start: function () {
+      on_timeline_start: function() {
         this.timeline_variables = experimentStimuli;
       },
       timeline: [preload, blankPage, showImg, blankPage, logging],
@@ -164,7 +172,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     timeline.push(testProcedure);
 
     const loop_node = {
-      loop_function: function () {
+      loop_function: function() {
         // tracking number of corret answers
         // need to access logging trial info
         let clearSet = false;

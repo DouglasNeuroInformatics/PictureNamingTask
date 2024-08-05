@@ -26,9 +26,7 @@ const totalNumberOfTrialsToRun = Number(
 );
 let advancementSchedule = Number(experimentSettings.advancementSchedule);
 let regressionSchedule = Number(experimentSettings.regressionSchedule);
-let { language, seed } = experimentSettings;
-// add logic to initialize with initialDifficulty
-// let intialDifficulty = Number(experimentSettings.initialDifficulty);
+let { language, seed, numberOfLevels } = experimentSettings;
 
 /*
 functions for generating
@@ -99,7 +97,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   let currentDifficultyLevel = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
-      on_finish: function () {
+      on_finish: function() {
         const data = jsPsych.data.get();
         transformAndDownload(data);
       },
@@ -146,7 +144,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
     <p>${i18n.t("logResponseToContinue")}</p>
   `,
-      preamble: function () {
+      preamble: function() {
         const html = `<h3>${i18n.t("correctResponse")}</h3>
                     <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>
                     <img src="${jsPsych.evaluateTimelineVariable("stimulus")}" width="300" height="300">`;
@@ -157,7 +155,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     };
     const testProcedure = {
       // to reload the experimentStimuli after one repetition has been completed
-      on_timeline_start: function () {
+      on_timeline_start: function() {
         this.timeline_variables = experimentStimuli;
       },
       timeline: [preload, blankPage, showImg, blankPage, logging],
@@ -166,7 +164,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     timeline.push(testProcedure);
 
     const loop_node = {
-      loop_function: function () {
+      loop_function: function() {
         // tracking number of corret answers
         // need to access logging trial info
         let clearSet = false;
@@ -192,10 +190,12 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
         }
         // difficulty level logic, <x> correct answers in a row, increase, <y> incorrect answer decrease
         if (numberOfCorrectAnswers === advancementSchedule) {
-          currentDifficultyLevel++;
-          // need to reset as difficulty has changed
-          numberOfCorrectAnswers = 0;
-          clearSet = true;
+          if (numberOfCorrectAnswers <= numberOfLevels) {
+            currentDifficultyLevel++;
+            // need to reset as difficulty has changed
+            numberOfCorrectAnswers = 0;
+            clearSet = true;
+          }
         } else if (numberOfCorrectAnswers === regressionSchedule) {
           if (currentDifficultyLevel > 1) {
             currentDifficultyLevel--;

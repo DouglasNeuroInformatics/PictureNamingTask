@@ -1,2 +1,2 @@
-totalNumberOfTrialsToRun,advancementSchedule,regressionSchedule,language,seed,initialDifficulty
-5,2,0,fr,42,1
+totalNumberOfTrialsToRun,advancementSchedule,regressionSchedule,language,seed,initialDifficulty, numberOfLevels
+5,2,0,fr,42,1,9

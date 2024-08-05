@@ -17,14 +17,12 @@ The following pieces of data are recorded and downloaded in a .csv file at the e
 Check out the :doc:`usage` section for further information, including
 how to :ref:`installation` the project.
 
-.. note::
-
-   This project is under active development.
 
 Contents
 --------
 
 .. toctree::
 
+   home  
    usage
 

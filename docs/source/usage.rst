@@ -48,7 +48,8 @@ Stimuli are added to the data.csv found in the `dist/assets` directory as follow
 Changing experiment settings
 ----------------
 
-Experiment settings are changed in the experimentSettings.csv file which can found in the `dist/assets` directory. These settings are described below:
+Experiment settings are changed in the experimentSettings.csv file which is located in the `dist/assets` directory. A template for this file can be found in the `public` directory: `public/experimentSettings  <https://github.com/DouglasNeuroInformatics/PictureNamingTask/blob/main/public/experimentSettings.csv>`
+These settings are described below:
 
 - totalNumberOfTrialsToRun <number>: this is the number of images to be shown, a number
 - advancementSchedule <number>: the number of correct answers that are required to increase the difficutly level by one, a number

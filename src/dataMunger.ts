@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-objects */
 import { DataCollection } from "jspsych";
 
 export type ParticipantResponse = {
@@ -27,17 +28,16 @@ function dataMunger(data: DataCollection) {
   const trials = data
     .filter({ trial_type: "survey-html-form" })
     .values() as LoggingTrial[];
-
   const experimentResults: ExperimentResults[] = [];
   for (let trial of trials) {
     experimentResults.push({
+      stimulus: trial.stimulus,
       correctResponse: trial.correctResponse,
       difficultyLevel: trial.difficultyLevel,
       language: trial.language,
-      responseNotes: trial.response.notes,
-      responseResult: trial.response.result,
       rt: trial.rt,
-      stimulus: trial.stimulus,
+      responseResult: trial.response.result,
+      responseNotes: trial.response.notes,
     });
   }
   return experimentResults;

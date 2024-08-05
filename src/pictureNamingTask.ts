@@ -2,6 +2,7 @@ import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import ImageKeyboardResponsePlugin from "@jspsych/plugin-image-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
 import SurveyHtmlFormPlugin from "@jspsych/plugin-survey-html-form";
+import DOMPurify from "dompurify";
 import { initJsPsych } from "jspsych";
 import prand from "pure-rand";
 
@@ -18,7 +19,7 @@ import "jspsych/css/jspsych.css";
 //****************************
 //****EXPERIMENT_SETTINGS*****
 //****************************
-// variables for controlling advancementSchedule, regressionSchedule, and when the experiment is
+// variables for controlling advancementSchedule, regressionSchedule, and when the experiment is finished
 let numberOfCorrectAnswers = 0;
 let numberOfTrialsRun = 1;
 const totalNumberOfTrialsToRun = Number(
@@ -26,7 +27,7 @@ const totalNumberOfTrialsToRun = Number(
 );
 let advancementSchedule = Number(experimentSettings.advancementSchedule);
 let regressionSchedule = Number(experimentSettings.regressionSchedule);
-let { language, seed, numberOfLevels } = experimentSettings;
+let { language, numberOfLevels, seed } = experimentSettings;
 
 /*
 functions for generating
@@ -97,7 +98,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
   let currentDifficultyLevel = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
-      on_finish: function() {
+      on_finish: function () {
         const data = jsPsych.data.get();
         transformAndDownload(data);
       },
@@ -144,18 +145,17 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
     <p>${i18n.t("logResponseToContinue")}</p>
   `,
-      preamble: function() {
+      preamble: function () {
         const html = `<h3>${i18n.t("correctResponse")}</h3>
                     <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>
                     <img src="${jsPsych.evaluateTimelineVariable("stimulus")}" width="300" height="300">`;
-
-        return html;
+        return DOMPurify.sanitize(html);
       },
       type: SurveyHtmlFormPlugin,
     };
     const testProcedure = {
       // to reload the experimentStimuli after one repetition has been completed
-      on_timeline_start: function() {
+      on_timeline_start: function () {
         this.timeline_variables = experimentStimuli;
       },
       timeline: [preload, blankPage, showImg, blankPage, logging],
@@ -164,7 +164,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     timeline.push(testProcedure);
 
     const loop_node = {
-      loop_function: function() {
+      loop_function: function () {
         // tracking number of corret answers
         // need to access logging trial info
         let clearSet = false;

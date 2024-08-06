@@ -1,9 +1,0 @@
-    <h3>${i18n.t("logResponse")}</h3>
-    <input type="button" value="${i18n.t("correct")}" onclick="document.getElementById('result').value='${i18n.t("correct")}';">
-    <input type="button" value="${i18n.t("incorrect")}" onclick="document.getElementById('result').value='${i18n.t("incorrect")}';">
-    <br>
-    <label for="result">${i18n.t("responseWas")}</label>
-    <input type="text" id="result" name="result" readonly>
-    <hr>
-    <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
-    <p>${i18n.t("logResponseToContinue")}</p>

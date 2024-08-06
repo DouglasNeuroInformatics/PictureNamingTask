@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
+import DOMPurify from "dompurify";
 import { DataCollection } from "jspsych";
-
 export type ParticipantResponse = {
   notes: string;
   result: string;
@@ -37,7 +37,7 @@ function dataMunger(data: DataCollection) {
       language: trial.language,
       rt: trial.rt,
       responseResult: trial.response.result,
-      responseNotes: trial.response.notes,
+      responseNotes: DOMPurify.sanitize(trial.response.notes),
     });
   }
   return experimentResults;

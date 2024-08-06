@@ -78,8 +78,7 @@ function createStimuli(
   if (clearSet === true) {
     indiciesSelected.clear();
   }
-  let imgList: ExperimentImage[] = imageDB;
-  imgList = imgList.filter(
+  let imgList: ExperimentImage[] = imageDB.filter(
     (image) =>
       Number(image.difficultyLevel) === difficultyLevel &&
       image.language === language,

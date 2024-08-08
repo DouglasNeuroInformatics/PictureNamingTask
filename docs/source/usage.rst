@@ -56,11 +56,11 @@ Experiment settings are changed in the experimentSettings.csv file which is loca
 These settings are described below:
 
 - totalNumberOfTrialsToRun <number>: this is the number of images to be shown
-- advancementSchedule <number>: the number of correct answers that are required to increase the difficutly level by one
-- regressionSchedule <number>: the number of incorrect answers required to decrease the difficutly level by one
+- advancementSchedule <number>: the number of correct answers that are required to increase the difficulty level by one
+- regressionSchedule <number>: the number of incorrect answers required to decrease the difficulty level by one
 - language <text>: the language of experiment, currently `en` or `fr`
 - seed <number>: a seed for the psuedorandom number generator
-- initialDifficulty <number>: the difficutly that the task will start with
+- initialDifficulty <number>: the difficulty that the task will start with
 - numberOfLevels <number>: the number of levels that are available for the task
 
 .. csv-table:: experimentSettings :rst:dir:`csv-table`

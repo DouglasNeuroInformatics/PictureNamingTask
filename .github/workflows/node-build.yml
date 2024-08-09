@@ -37,7 +37,7 @@ jobs:
       - run: pnpm install
       - run: pnpm build
         env:
-          VITE_BASE: /PictureNamingTask/
+          VITE_BASE: /pnt-test/
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact

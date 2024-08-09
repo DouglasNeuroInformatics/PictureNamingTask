@@ -1,54 +1,46 @@
-import { initJsPsych } from "jspsych";
-import "jspsych/css/jspsych.css";
 import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
-import SurveyHtmlFormPlugin from "@jspsych/plugin-survey-html-form";
 import ImageKeyboardResponsePlugin from "@jspsych/plugin-image-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
+import SurveyHtmlFormPlugin from "@jspsych/plugin-survey-html-form";
+import DOMPurify from "dompurify";
+import { initJsPsych } from "jspsych";
+import prand from "pure-rand";
+
 import { transformAndDownload } from "./dataMunger";
 import { experimentSettings } from "./fetchAndParse";
 import { imageDB } from "./fetchAndParse";
-import prand from "pure-rand";
-import i18n from "./services/i18n.ts";
-/*
- * Translations
- *
- *
- */
-i18n.init;
-const welcomeText = i18n.t("welcome");
-console.log("++++++++++++++");
-console.log(welcomeText);
+import i18n from "./services/i18n";
+
+import type { LoggingTrial } from "./dataMunger";
+import type { ParticipantResponse } from "./dataMunger";
+import type { ExperimentImage } from "./fetchAndParse";
+
+import "jspsych/css/jspsych.css";
+
+
 //****************************
 //****EXPERIMENT_SETTINGS*****
 //****************************
-// variables for controlling advancementSchedule, regressionSchedule, and when the experiment is
-// finished
-let numberOfCorrectAnswers: number = 0;
-let numberOfTrialsRun: number = 1;
-// dynamically loading user experimentSettings
-let totalNumberOfTrialsToRun = Number(
+// variables for controlling advancementSchedule, regressionSchedule, and when the experiment is finished
+let numberOfCorrectAnswers = 0;
+let numberOfTrialsRun = 1;
+const totalNumberOfTrialsToRun = Number(
   experimentSettings.totalNumberOfTrialsToRun,
 );
 let advancementSchedule = Number(experimentSettings.advancementSchedule);
 let regressionSchedule = Number(experimentSettings.regressionSchedule);
-// add logic to initialize with initialDifficulty
-// let intialDifficulty = Number(experimentSettings.initialDifficulty);
-let language = experimentSettings.language;
-let seed = experimentSettings.seed;
-
-console.log(
-  `Experiment will proceed with totalNumberOfTrialsToRun of ${totalNumberOfTrialsToRun}, an advancementSchedule of ${advancementSchedule}, and a regressionSchedule of ${regressionSchedule}`,
-);
+let { language, numberOfLevels, seed } = experimentSettings;
 
 /*
 functions for generating
-experiment_stimuli
+experimentStimuli
 */
 
 const indiciesSelected = new Set();
 let rng = prand.xoroshiro128plus(seed);
 
-function getRandomElementWithSeed(array: any[]) {
+// closure
+function getRandomElementWithSeed(array: ExperimentImage[]): ExperimentImage[] {
   let randomIndex: number;
   let foundUnique = false;
 
@@ -72,165 +64,156 @@ function getRandomElementWithSeed(array: any[]) {
     }
   } while (!foundUnique);
 
-  console.log("Selected Index:", randomIndex);
-  console.log("Selected Indices Set:", indiciesSelected);
-
-  let result = [array[randomIndex]];
-  console.log("***********************");
-  console.log("Result from random index:");
-  console.table(result);
-  console.log("***********************");
+  const result = [array[randomIndex]!];
   return result;
 }
 
 // draw an image at random from the bank depending on the difficulty_level selected
+// closure
 function createStimuli(
   difficultyLevel: number,
   language: string,
   clearSet: boolean,
-) {
+): ExperimentImage[] {
   if (clearSet === true) {
     indiciesSelected.clear();
   }
-  try {
-    let imgList = imageDB;
-    imgList = imgList.filter(
-      (image: any) =>
-        Number(image.difficultyLevel) === difficultyLevel &&
-        image.language === language,
-    );
-    console.log("filtered");
-    console.log(imgList);
-    let result = getRandomElementWithSeed(imgList);
-    return result;
-  } catch (error) {
-    console.error("Error fetching and parsing data:", error);
-  }
+  let imgList: ExperimentImage[] = imageDB.filter(
+    (image) =>
+      Number(image.difficultyLevel) === difficultyLevel &&
+      image.language === language,
+  );
+  let result = getRandomElementWithSeed(imgList);
+  return result;
 }
+
 
 //****************************
 //********EXPERIMENT**********
 //****************************
 // a timeline is a set of trials
 // a trial is a single object eg htmlKeyboardResponse etc ...
-const timeline: any[] = [];
+// @ts-expect-error the trials have different structures
+const timeline = [];
 export default function pictureNamingTask(difficultyLevelParam: number) {
-  let experiment_stimuli = createStimuli(difficultyLevelParam, language, false);
-  let currentDifficultyLevel: number = difficultyLevelParam;
+  let experimentStimuli = createStimuli(difficultyLevelParam, language, false);
+  let currentDifficultyLevel = difficultyLevelParam;
   if (difficultyLevelParam) {
     const jsPsych = initJsPsych({
-      on_finish: function () {
-        transformAndDownload(jsPsych.data);
+      on_finish: function() {
+        const data = jsPsych.data.get();
+        transformAndDownload(data);
       },
     });
 
     const welcome = {
+      stimulus: i18n.t("welcome"),
       type: HtmlKeyboardResponsePlugin,
-      stimulus: `${welcomeText}`,
     };
 
     const preload = {
-      type: PreloadPlugin,
       auto_preload: true,
-      show_progress_bar: true,
       message: `<p>loading stimulus</p>`,
+      show_progress_bar: true,
+      type: PreloadPlugin,
     };
 
     const blankPage = {
-      type: HtmlKeyboardResponsePlugin,
       stimulus: "",
+      type: HtmlKeyboardResponsePlugin,
     };
     const showImg = {
-      type: ImageKeyboardResponsePlugin,
-      stimulus_height: 600,
       stimulus: jsPsych.timelineVariable("stimulus"),
+      stimulus_height: 600,
+      type: ImageKeyboardResponsePlugin,
     };
 
     const logging = {
-      type: SurveyHtmlFormPlugin,
-      preamble: function () {
-        const html = `<h3>Correct response: </h3>
-                    <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>
-                    <img src="${jsPsych.evaluateTimelineVariable("stimulus")}" width="300" height="300">`;
-
-        return html;
+      autofocus: "textBox",
+      button_label: i18n.t("submit"),
+      data: {
+        correctResponse: jsPsych.timelineVariable("correctResponse"),
+        difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
+        language: jsPsych.timelineVariable("language"),
       },
       html: `
-    <h3>Log the response</h3>
-    <input type="button" value="Correct" onclick="document.getElementById('result').value='Correct';">
-    <input type="button" value="Incorrect" onclick="document.getElementById('result').value='Incorrect';">
+    <h3>${i18n.t("logResponse")}</h3>
+    <input type="button" value="${i18n.t("correct")}" onclick="document.getElementById('result').value='${i18n.t("correct")}';">
+    <input type="button" value="${i18n.t("incorrect")}" onclick="document.getElementById('result').value='${i18n.t("incorrect")}';">
     <br>
-    <label for="result">The response was:</label>
+    <label for="result">${i18n.t("responseWas")}</label>
     <input type="text" id="result" name="result" readonly>
     <hr>
-    <input type="text" id="textBox" name="notes" placeholder="Log any other notes here">
-    <p>Log response and press submit to continue</p>
-  `,
-      button_label: "Submit",
-      autofocus: "textBox",
-      data: {
-        difficultyLevel: jsPsych.evaluateTimelineVariable("difficultyLevel"),
-        correctResponse: jsPsych.evaluateTimelineVariable("correctResponse"),
+    <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
+    <p>${i18n.t("logResponseToContinue")}</p>`
+      ,
+      preamble: function() {
+        const html = `<h3>${i18n.t("correctResponse")}</h3>
+                    <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>
+                    <img src="${jsPsych.evaluateTimelineVariable("stimulus")}" width="300" height="300">`;
+        return DOMPurify.sanitize(html);
       },
+      type: SurveyHtmlFormPlugin,
     };
     const testProcedure = {
-      timeline: [preload, blankPage, showImg, blankPage, logging],
-      timeline_variables: experiment_stimuli,
-      // to reload the experiment_stimuli after one repetition has been completed
-      on_timeline_start: function () {
-        this.timeline_variables = experiment_stimuli;
+      // to reload the experimentStimuli after one repetition has been completed
+      on_timeline_start: function() {
+        this.timeline_variables = experimentStimuli;
       },
+      timeline: [preload, blankPage, showImg, blankPage, logging],
+      timeline_variables: experimentStimuli,
     };
     timeline.push(testProcedure);
 
     const loop_node = {
-      timeline: timeline,
-      loop_function: function (data: any) {
-        data = data;
+      loop_function: function() {
         // tracking number of corret answers
         // need to access logging trial info
         let clearSet = false;
-        if (numberOfTrialsRun < totalNumberOfTrialsToRun) {
-          // getting the most recent logged result
-          const loggingResponseArray: [] = jsPsych.data
-            .get()
-            .filter({ trial_type: "survey-html-form" })["trials"];
-          const lastTrialIndex = loggingResponseArray.length - 1;
-          const lastTrialResults =
-            loggingResponseArray[lastTrialIndex]["response"];
 
-          if (lastTrialResults["result"] === "Correct") {
-            numberOfCorrectAnswers++;
-            clearSet = false;
-          } else if (lastTrialResults["result"] === "Incorrect") {
-            numberOfCorrectAnswers = 0;
-          }
-          // difficulty level logic, <x> correct answers in a row, increase, <y> incorret answer decrease
-          if (numberOfCorrectAnswers === advancementSchedule) {
+        if (numberOfTrialsRun === totalNumberOfTrialsToRun) {
+          return false;
+        }
+        // getting the most recent logged result
+        const loggingResponseArray = jsPsych.data
+          .get()
+          // @ts-expect-error .trials is private to DataCollection
+          .filter({ trial_type: "survey-html-form" }).trials as LoggingTrial[];
+        const lastTrialIndex = loggingResponseArray.length - 1;
+
+        const lastTrialResults: ParticipantResponse =
+          loggingResponseArray[lastTrialIndex]!.response;
+
+        if (lastTrialResults.result === "Correct") {
+          numberOfCorrectAnswers++;
+          clearSet = false;
+        } else if (lastTrialResults.result === "Incorrect") {
+          numberOfCorrectAnswers = 0;
+        }
+        // difficulty level logic, <x> correct answers in a row, increase, <y> incorrect answer decrease
+        if (numberOfCorrectAnswers === advancementSchedule) {
+          if (numberOfCorrectAnswers <= numberOfLevels) {
             currentDifficultyLevel++;
             // need to reset as difficulty has changed
             numberOfCorrectAnswers = 0;
             clearSet = true;
-          } else if (numberOfCorrectAnswers === regressionSchedule) {
-            if (currentDifficultyLevel > 1) {
-              currentDifficultyLevel--;
-            }
           }
-          experiment_stimuli = createStimuli(
-            currentDifficultyLevel,
-            language,
-            clearSet,
-          );
-          numberOfTrialsRun++;
-          console.log(`numberOfTrialsRun: ${numberOfTrialsRun}`);
-          return true;
-        } else if (numberOfTrialsRun === totalNumberOfTrialsToRun) {
-          console.log("trial complete");
-          return false;
+        } else if (numberOfCorrectAnswers === regressionSchedule) {
+          if (currentDifficultyLevel > 1) {
+            currentDifficultyLevel--;
+          }
         }
+        experimentStimuli = createStimuli(
+          currentDifficultyLevel,
+          language,
+          clearSet,
+        );
+        numberOfTrialsRun++;
+        return true;
       },
+      //@ts-expect-error timeline contains trials of different structures
+      timeline,
     };
-    // @ts-ignore
-    jsPsych.run([welcome, loop_node]);
+    void jsPsych.run([welcome, loop_node]);
   }
 }

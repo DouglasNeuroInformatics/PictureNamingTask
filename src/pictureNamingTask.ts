@@ -107,9 +107,15 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     });
 
     const welcome = {
+      on_start: function() {
+        document.addEventListener('click', function() {
+          jsPsych.pluginAPI.keyDown('a');
+        });
+      },
       stimulus: i18n.t("welcome"),
-      type: HtmlKeyboardResponsePlugin,
+      type: HtmlKeyboardResponsePlugin
     };
+
 
     const preload = {
       auto_preload: true,
@@ -119,6 +125,11 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     };
 
     const blankPage = {
+      on_start: function() {
+        document.addEventListener('click', function() {
+          jsPsych.pluginAPI.keyDown('a');
+        });
+      },
       stimulus: "",
       type: HtmlKeyboardResponsePlugin,
     };

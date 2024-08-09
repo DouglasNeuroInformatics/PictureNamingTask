@@ -4,14 +4,13 @@ Usage
 .. _installation:
 
 Serving locally
-------------
+----------------
 
 To use PictureNamingTask locally a simple http server can be used. Either download the dist from the github or build the package from source eg ``npm build`` Then the index.html file can be served locally.
 Python3 offers a command to serve the index.html locally with one command. First ensure python3 is installed. `It can be found here <https://www.python.org/downloads/>`_. Choose the appropriate package for the OS that you have. 
 Using a terminal or powershell first navitage to the directory containing the index.html file then:
 
 .. code-block:: console
-
   cd path/to/directory/containing/index.html
   python -m http.server
 
@@ -32,7 +31,7 @@ To start the server on another port use (example 8080):
 
 More information about ``python http.server`` can be found here https://docs.python.org/3/library/http.server.html
 
-.. _adding-stimuli
+.. _adding-stimuli:
 
 Adding stimuli
 ----------------
@@ -47,10 +46,10 @@ Stimuli are added to the data.csv found in the `dist/assets` directory as follow
    "path/to/img_of_a_dog.jpg",    "1",      "Un chien",       "fr"
    "path/to/img_of_a_cat.jpg",    "2",      "Un chat",        "fr"
 
-.. _changing-experiment-settings
+.. _changing-experiment-settings:
 
 Changing experiment settings
-----------------
+----------------------------
 
 Experiment settings are changed in the experimentSettings.csv file which is located in the `dist/assets` directory. A template for this file can be found in the `public` directory: `public/experimentSettings  <https://github.com/DouglasNeuroInformatics/PictureNamingTask/blob/main/public/experimentSettings.csv>`
 These settings are described below:
@@ -67,15 +66,14 @@ These settings are described below:
    :header: totalNumberOfTrialsToRun, advancementSchedule, regressionSchedule, language, seed, initialDifficulty, numberOfLevels,
    5, 2, 0, en, 42, 1, 9
 
-.. _adding-additional-languge
+.. _adding-additional-languge:
 
 Adding additional language
-------------
+--------------------------
 
 Adding additional languages can be accomplished by accessing the `locales` directory in `dist/assets` and adding a `translation.json` for the language of interest. 
 `translation.json` must be placed in a `locales/XX/` directory where `XX` is the two letter language code for the language of interest. 
 Images with the corresponding language code must be included in the `data.csv` as per :ref:`adding-stimuli`.
-
 
 
 

@@ -152,17 +152,34 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
         difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
         language: jsPsych.timelineVariable("language"),
       },
-      html: `
-    <h3>${i18n.t("logResponse")}</h3>
-    <input type="button" value="${i18n.t("correct")}" onclick="document.getElementById('result').value='${i18n.t("correct")}';">
-    <input type="button" value="${i18n.t("incorrect")}" onclick="document.getElementById('result').value='${i18n.t("incorrect")}';">
-    <br>
-    <label for="result">${i18n.t("responseWas")}</label>
-    <input type="text" id="result" name="result" readonly>
-    <hr>
-    <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
-    <p>${i18n.t("logResponseToContinue")}</p>`
-      ,
+      html: function() {
+        const html = `
+          <h3>${i18n.t("logResponse")}</h3>
+          <input type="button" value="${i18n.t("correct")}" onclick="document.getElementById('result').value='${i18n.t("correct")}';">
+          <input type="button" value="${i18n.t("incorrect")}" onclick="document.getElementById('result').value='${i18n.t("incorrect")}';">
+          <br>
+          <label for="result">${i18n.t("responseWas")}</label>
+          <input type="text" id="result" name="result" readonly>
+          <hr>
+          <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
+          <p>${i18n.t("logResponseToContinue")}</p>`
+        return html
+      },
+      on_load: function() {
+
+        const submitButton = document.getElementById('jspsych-survey-html-form-next') as HTMLButtonElement
+        const resultInput = document.getElementById('result') as HTMLInputElement
+        submitButton.disabled = true
+        document.querySelectorAll('input[type="button"]').forEach(button => {
+          button.addEventListener('click', () => {
+            if (resultInput.value !== '') {
+              submitButton.disabled = false;
+            }
+          });
+        });
+
+
+      },
       preamble: function() {
         const html = `<h3>${i18n.t("correctResponse")}</h3>
                     <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>

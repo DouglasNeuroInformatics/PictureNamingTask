@@ -3,7 +3,7 @@ import ImageKeyboardResponsePlugin from "@jspsych/plugin-image-keyboard-response
 import PreloadPlugin from "@jspsych/plugin-preload";
 import SurveyHtmlFormPlugin from "@jspsych/plugin-survey-html-form";
 import DOMPurify from "dompurify";
-import { initJsPsych } from "jspsych";
+import { JsPsych, initJsPsych } from "jspsych";
 import prand from "pure-rand";
 
 import { transformAndDownload } from "./dataMunger";
@@ -87,6 +87,12 @@ function createStimuli(
   return result;
 }
 
+// to handle clicks on a touchscreen as a keyboard response 
+
+function simulateKeyPress(jsPsych: JsPsych, key: string) {
+  jsPsych.pluginAPI.keyDown(key)
+  jsPsych.pluginAPI.keyUp(key)
+}
 
 //****************************
 //********EXPERIMENT**********
@@ -108,11 +114,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
 
     const welcome = {
       on_start: function() {
-        document.addEventListener('click', function() {
-          jsPsych.pluginAPI.keyDown('a');
-          jsPsych.pluginAPI.keyUp('a')
-
-        });
+        document.addEventListener('click', () => simulateKeyPress(jsPsych, 'a'), { once: true })
       },
       stimulus: i18n.t("welcome"),
       type: HtmlKeyboardResponsePlugin,
@@ -127,10 +129,16 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     };
 
     const blankPage = {
+      on_start: function() {
+        document.addEventListener('click', () => simulateKeyPress(jsPsych, 'a'), { once: true })
+      },
       stimulus: "",
       type: HtmlKeyboardResponsePlugin,
     };
     const showImg = {
+      on_start: function() {
+        document.addEventListener('click', () => simulateKeyPress(jsPsych, 'a'), { once: true })
+      },
       stimulus: jsPsych.timelineVariable("stimulus"),
       stimulus_height: 600,
       type: ImageKeyboardResponsePlugin,

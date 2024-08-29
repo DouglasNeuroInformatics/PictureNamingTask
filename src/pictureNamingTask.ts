@@ -49,6 +49,7 @@ export function pictureNamingTask(
     regressionSchedule = experimentSettingsCSV.regressionSchedule;
     ({ language, numberOfLevels, seed } = experimentSettingsCSV);
     imageDB = imageDbCSV;
+    console.table(imageDB);
     downloadOnFinish = experimentSettingsCSV.downloadOnFinish;
   }
 
@@ -103,7 +104,7 @@ experimentStimuli
     }
     let imgList: ExperimentImage[] = imageDB.filter(
       (image) =>
-        Number(image.difficultyLevel) === difficultyLevel &&
+        image.difficultyLevel === difficultyLevel &&
         image.language === language,
     );
     let result = getRandomElementWithSeed(imgList);

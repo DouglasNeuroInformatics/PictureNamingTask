@@ -1,5 +1,7 @@
 import { experimentSettings } from "./fetchAndParse";
-import pictureNamingTask from "./pictureNamingTask";
+import { pictureNamingTask } from "./pictureNamingTask";
+
+import "/runtime/v1/jspsych@8.x/css/jspsych.css";
 
 async function checkFilesExists(baseUrl: string, filePath: string) {
   const path = baseUrl + filePath;

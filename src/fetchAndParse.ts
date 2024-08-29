@@ -1,6 +1,4 @@
-import Papa from "papaparse";
-
-import "./style.css";
+import Papa from "/runtime/v1/papaparse@5.x";
 
 export type ExperimentImage = {
   correctResponse: string;

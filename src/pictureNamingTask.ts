@@ -49,7 +49,6 @@ export function pictureNamingTask(
     regressionSchedule = experimentSettingsCSV.regressionSchedule;
     ({ language, numberOfLevels, seed } = experimentSettingsCSV);
     imageDB = imageDbCSV;
-    console.table(imageDB);
     downloadOnFinish = experimentSettingsCSV.downloadOnFinish;
   }
 

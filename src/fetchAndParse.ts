@@ -35,7 +35,7 @@ const experimentSettingsPath = baseUrl + "experimentSettings.csv";
 
 const parsedImageDB = await fetchAndParse(dataPath);
 const parsedExperimentSettings = await fetchAndParse(experimentSettingsPath);
-const experimentSettings = parsedExperimentSettings.data[0] as Settings;
-const imageDB = parsedImageDB.data as ExperimentImage[];
+const experimentSettingsCSV = parsedExperimentSettings.data[0] as Settings;
+const imageDbCSV = parsedImageDB.data as ExperimentImage[];
 
-export { experimentSettings, imageDB };
+export { experimentSettingsCSV, imageDbCSV };

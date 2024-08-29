@@ -1,5 +1,6 @@
 import { transformAndDownload, transformAndExportJson } from "./dataMunger.ts";
-import { experimentSettingsJson as experimentSettings } from "./experimentSettings.ts";
+import { experimentSettingsJson } from "./experimentSettings.ts";
+import { useJson } from "./globalState.ts";
 import i18n from "./i18n.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
 
@@ -20,6 +21,7 @@ import {
   uniformIntDistribution,
   xoroshiro128plus,
 } from "/runtime/v1/pure-rand@6.x";
+import { experimentSettingsCSV, imageDbCSV } from "./fetchAndParse.ts";
 
 export function pictureNamingTask(
   difficultyLevelParam: number,
@@ -29,16 +31,24 @@ export function pictureNamingTask(
   //****EXPERIMENT_SETTINGS*****
   //****************************
   // variables for controlling advancementSchedule, regressionSchedule, and when the experiment is finished
+  //
+  // can be read from either the csv files in public or via json if using the instrument playground
   let numberOfCorrectAnswers = 0;
   let numberOfTrialsRun = 1;
-  const totalNumberOfTrialsToRun = Number(
-    experimentSettings.totalNumberOfTrialsToRun,
-  );
-  let advancementSchedule = Number(experimentSettings.advancementSchedule);
-  let regressionSchedule = Number(experimentSettings.regressionSchedule);
-  let { language, numberOfLevels, seed } = experimentSettings;
+  let totalNumberOfTrialsToRun =
+    experimentSettingsJson.totalNumberOfTrialsToRun;
+  let advancementSchedule = experimentSettingsJson.advancementSchedule;
+  let regressionSchedule = experimentSettingsJson.regressionSchedule;
+  let { language, numberOfLevels, seed } = experimentSettingsJson;
+  let imageDB = stimuliPaths as ExperimentImage[];
 
-  const imageDB = stimuliPaths as ExperimentImage[];
+  if (!useJson) {
+    totalNumberOfTrialsToRun = experimentSettingsCSV.totalNumberOfTrialsToRun;
+    advancementSchedule = experimentSettingsCSV.advancementSchedule;
+    regressionSchedule = experimentSettingsCSV.regressionSchedule;
+    ({ language, numberOfLevels, seed } = experimentSettingsCSV);
+    imageDB = imageDbCSV;
+  }
 
   /*
 functions for generating

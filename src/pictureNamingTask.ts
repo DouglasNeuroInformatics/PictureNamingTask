@@ -3,13 +3,15 @@ import { experimentSettingsJson } from "./experimentSettings.ts";
 import { experimentSettingsCSV, imageDbCSV } from "./fetchAndParse.ts";
 import { useJson } from "./globalState.ts";
 import i18n from "./i18n.ts";
+import {
+  $settings,
+  type ExperimentImage,
+  type LoggingTrial,
+  type ParticipantResponse,
+  type Settings,
+} from "./schemas.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
 
-import type {
-  ExperimentImage,
-  LoggingTrial,
-  ParticipantResponse,
-} from "./schemas.ts";
 import type { JsPsych } from "/runtime/v1/jspsych@8.x/index.js";
 
 import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x/index.js";
@@ -32,25 +34,36 @@ export function pictureNamingTask(
   //****************************
   // variables for controlling advancementSchedule, regressionSchedule, and when the experiment is finished
   //
-  // can be read from either the csv files in public or via json if using the instrument playground
+  // can be read from either the csv files in public/ or via json if using the instrument playground
+
   let numberOfCorrectAnswers = 0;
   let numberOfTrialsRun = 1;
-  let totalNumberOfTrialsToRun =
-    experimentSettingsJson.totalNumberOfTrialsToRun;
-  let advancementSchedule = experimentSettingsJson.advancementSchedule;
-  let regressionSchedule = experimentSettingsJson.regressionSchedule;
-  let { language, numberOfLevels, seed } = experimentSettingsJson;
-  let imageDB = stimuliPaths as ExperimentImage[];
-  let downloadOnFinish = experimentSettingsJson.downloadOnFinish;
+  let settingsParseResult;
+  let imageDB: ExperimentImage[];
 
-  if (!useJson) {
-    totalNumberOfTrialsToRun = experimentSettingsCSV.totalNumberOfTrialsToRun;
-    advancementSchedule = experimentSettingsCSV.advancementSchedule;
-    regressionSchedule = experimentSettingsCSV.regressionSchedule;
-    ({ language, numberOfLevels, seed } = experimentSettingsCSV);
+  if (useJson) {
+    settingsParseResult = $settings.safeParse(experimentSettingsJson);
+    imageDB = stimuliPaths;
+  } else {
+    settingsParseResult = $settings.safeParse(experimentSettingsCSV);
     imageDB = imageDbCSV;
-    downloadOnFinish = experimentSettingsCSV.downloadOnFinish;
   }
+
+  if (!settingsParseResult.success) {
+    throw new Error("validation error, check experiment settings", {
+      cause: settingsParseResult.error,
+    });
+  }
+
+  const {
+    totalNumberOfTrialsToRun,
+    advancementSchedule,
+    regressionSchedule,
+    language,
+    numberOfLevels,
+    seed,
+    downloadOnFinish,
+  } = settingsParseResult.data;
 
   /*
 functions for generating

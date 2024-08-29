@@ -10,10 +10,10 @@ const $trial = z.object({
 });
 const $loggingTrial = $trial.extend({
   correctResponse: z.string(),
-  difficultyLevel: z.number(),
+  difficultyLevel: z.coerce.number().positive().int(),
   language: $language,
   response: $participantResponse,
-  rt: z.number(),
+  rt: z.coerce.number().positive().int(),
   stimulus: z.string(),
 });
 export const $experimentResults = $loggingTrial
@@ -23,26 +23,27 @@ export const $experimentResults = $loggingTrial
     responseResult: z.string(),
   });
 
+export const $settings = z.object({
+  advancementSchedule: z.coerce.number().positive().int(),
+  downloadOnFinish: z.coerce.boolean(),
+  initialDifficulty: z.coerce.number().positive().int(),
+  language: z.string(),
+  numberOfLevels: z.coerce.number().positive().int(),
+  regressionSchedule: z.coerce.number().int(),
+  seed: z.coerce.number().positive().int(),
+  totalNumberOfTrialsToRun: z.coerce.number().positive().int(),
+});
+
+export const $experimentImage = z.object({
+  correctResponse: z.string(),
+  difficultyLevel: z.coerce.number().positive().int(),
+  language: z.string(),
+  stimulus: z.string(),
+});
+
 export type ParticipantResponse = z.infer<typeof $participantResponse>;
 export type Trial = z.infer<typeof $trial>;
 export type LoggingTrial = z.infer<typeof $loggingTrial>;
 export type ExperimentResults = z.infer<typeof $experimentResults>;
-
-export type ExperimentImage = {
-  correctResponse: string;
-  difficultyLevel: number;
-  language: string;
-  stimulus: string;
-};
-
-export type Settings = {
-  advancementSchedule: number;
-  downloadOnFinish: boolean;
-  initialDifficulty: number;
-  language: string;
-  numberOfLevels: number;
-  regressionSchedule: number;
-  seed: number;
-  totalNumberOfTrialsToRun: number;
-};
-
+export type Settings = z.infer<typeof $settings>;
+export type ExperimentImage = z.infer<typeof $experimentImage>;

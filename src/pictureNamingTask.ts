@@ -1,5 +1,6 @@
 import { transformAndDownload, transformAndExportJson } from "./dataMunger.ts";
 import { experimentSettingsJson } from "./experimentSettings.ts";
+import { experimentSettingsCSV, imageDbCSV } from "./fetchAndParse.ts";
 import { useJson } from "./globalState.ts";
 import i18n from "./i18n.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
@@ -21,7 +22,6 @@ import {
   uniformIntDistribution,
   xoroshiro128plus,
 } from "/runtime/v1/pure-rand@6.x";
-import { experimentSettingsCSV, imageDbCSV } from "./fetchAndParse.ts";
 
 export function pictureNamingTask(
   difficultyLevelParam: number,
@@ -41,6 +41,7 @@ export function pictureNamingTask(
   let regressionSchedule = experimentSettingsJson.regressionSchedule;
   let { language, numberOfLevels, seed } = experimentSettingsJson;
   let imageDB = stimuliPaths as ExperimentImage[];
+  let downloadOnFinish = experimentSettingsJson.downloadOnFinish;
 
   if (!useJson) {
     totalNumberOfTrialsToRun = experimentSettingsCSV.totalNumberOfTrialsToRun;
@@ -48,6 +49,7 @@ export function pictureNamingTask(
     regressionSchedule = experimentSettingsCSV.regressionSchedule;
     ({ language, numberOfLevels, seed } = experimentSettingsCSV);
     imageDB = imageDbCSV;
+    downloadOnFinish = experimentSettingsCSV.downloadOnFinish;
   }
 
   /*
@@ -133,7 +135,7 @@ experimentStimuli
       const jsPsych = initJsPsych({
         on_finish: function () {
           const data = jsPsych.data.get();
-          if (experimentSettings.downloadOnFinish) {
+          if (downloadOnFinish) {
             transformAndDownload(data);
           }
           if (onFinish) {

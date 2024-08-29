@@ -1,4 +1,4 @@
-import { experimentSettings } from "./fetchAndParse";
+import { experimentSettingsCSV } from "./fetchAndParse";
 import { pictureNamingTask } from "./pictureNamingTask";
 
 import "/runtime/v1/jspsych@8.x/css/jspsych.css";
@@ -56,7 +56,7 @@ void (async () => {
     throw new Error("Failed to fetch and parse the experimentSettings.csv.");
   }
   if (parsedImageDB && parsedExperimentSettings) {
-    const difficultyLevel = Number(experimentSettings.initialDifficulty);
+    const difficultyLevel = experimentSettingsCSV.initialDifficulty;
     pictureNamingTask(difficultyLevel);
   }
 })();

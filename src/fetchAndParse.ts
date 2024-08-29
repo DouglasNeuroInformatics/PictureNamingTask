@@ -1,21 +1,6 @@
+import type { ExperimentImage, Settings } from "./schemas.ts";
+
 import Papa from "/runtime/v1/papaparse@5.x";
-
-export type ExperimentImage = {
-  correctResponse: string;
-  difficultyLevel: number;
-  language: string;
-  stimulus: string;
-};
-
-type Settings = {
-  advancementSchedule: number;
-  initialDifficulty: number;
-  language: string;
-  numberOfLevels: number;
-  regressionSchedule: number;
-  seed: number;
-  totalNumberOfTrialsToRun: number;
-};
 
 async function fetchAndParse(path: string) {
   // main.ts has logic to make sure the files exist

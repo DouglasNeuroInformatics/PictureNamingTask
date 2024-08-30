@@ -11,7 +11,6 @@ function dataMunger(data: DataCollection) {
     .values() as LoggingTrial[];
   const experimentResults: ExperimentResults[] = [];
   for (let trial of trials) {
-    console.table(trial)
     const result = $experimentResults.parse({
       stimulus: trial.stimulus,
       correctResponse: trial.correctResponse,

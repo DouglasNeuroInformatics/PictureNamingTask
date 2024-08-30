@@ -153,11 +153,9 @@ experimentStimuli
       on_finish: function() {
         const data = jsPsych.data.get();
         if (downloadOnFinish) {
-          console.log('downloadOnFinish')
           transformAndDownload(data);
         }
         if (onFinish) {
-          console.log('onFinish')
           onFinish(transformAndExportJson(data));
         }
       },

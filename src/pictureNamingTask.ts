@@ -12,13 +12,13 @@ import {
 } from "./schemas.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
 
-import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x/index.js";
+import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x";
 import { ImageKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x";
 import { PreloadPlugin } from "/runtime/v1/@jspsych/plugin-preload@2.x";
 import { SurveyHtmlFormPlugin } from "/runtime/v1/@jspsych/plugin-survey-html-form@2.x";
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
 import { initJsPsych } from "/runtime/v1/jspsych@8.x";
-import { JsPsych } from "/runtime/v1/jspsych@8.x/index.js";
+import { JsPsych } from "/runtime/v1/jspsych@8.x";
 import {
   uniformIntDistribution,
   xoroshiro128plus,

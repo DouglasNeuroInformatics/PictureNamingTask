@@ -12,14 +12,13 @@ import {
 } from "./schemas.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
 
-import type { JsPsych } from "/runtime/v1/jspsych@8.x/index.js";
-
 import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x/index.js";
 import { ImageKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x";
 import { PreloadPlugin } from "/runtime/v1/@jspsych/plugin-preload@2.x";
 import { SurveyHtmlFormPlugin } from "/runtime/v1/@jspsych/plugin-survey-html-form@2.x";
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
 import { initJsPsych } from "/runtime/v1/jspsych@8.x";
+import { JsPsych } from "/runtime/v1/jspsych@8.x/index.js";
 import {
   uniformIntDistribution,
   xoroshiro128plus,
@@ -154,9 +153,11 @@ experimentStimuli
       on_finish: function() {
         const data = jsPsych.data.get();
         if (downloadOnFinish) {
+          console.log('downloadOnFinish')
           transformAndDownload(data);
         }
         if (onFinish) {
+          console.log('onFinish')
           onFinish(transformAndExportJson(data));
         }
       },
@@ -209,6 +210,7 @@ experimentStimuli
       autofocus: "textBox",
       button_label: i18n.t("submit"),
       data: {
+        stimulus: jsPsych.timelineVariable("stimulus"),
         correctResponse: jsPsych.timelineVariable("correctResponse"),
         difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
         language: jsPsych.timelineVariable("language"),

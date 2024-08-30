@@ -9,7 +9,7 @@ async function fetchAndParse(path: string) {
     method: "GET",
   });
   const responseText = await response.text();
-  const data = Papa.parse(responseText, { header: true });
+  const data = Papa.parse(responseText, { header: true, skipEmptyLines: true });
   return data;
 }
 
@@ -21,7 +21,7 @@ const experimentSettingsPath = baseUrl + "experimentSettings.csv";
 const parsedImageDB = await fetchAndParse(dataPath);
 const parsedExperimentSettings = await fetchAndParse(experimentSettingsPath);
 const experimentSettingsCSV = parsedExperimentSettings.data[0] as Settings;
-console.table(experimentSettingsCSV);
 const imageDbCSV = parsedImageDB.data as ExperimentImage[];
+
 
 export { experimentSettingsCSV, imageDbCSV };

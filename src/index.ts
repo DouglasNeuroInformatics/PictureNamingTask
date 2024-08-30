@@ -23,7 +23,7 @@ export default defineInstrument({
   tags: ["interactive", "jsPysch", "PictureNamingTask"],
   content: {
     render(done) {
-      pictureNamingTask(experimentSettingsJson.initialDifficulty, done);
+      pictureNamingTask(done);
     },
   },
   details: {

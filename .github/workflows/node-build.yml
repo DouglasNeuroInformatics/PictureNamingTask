@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main", "ODC"]
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -37,7 +37,7 @@ jobs:
       - run: pnpm install
       - run: pnpm build
         env:
-          VITE_BASE: /pnt-test/
+          VITE_BASE: /PictureNamingTask/
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact

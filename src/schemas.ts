@@ -1,6 +1,11 @@
+import { type SupportedLanguage } from "./i18n.ts";
+
 import { z } from "/runtime/v1/zod@3.23.x";
 
+
 const $language = z.enum(["en", "fr"]);
+
+
 const $participantResponse = z.object({
   notes: z.string(),
   result: z.string(),
@@ -41,6 +46,7 @@ export const $experimentImage = z.object({
   stimulus: z.string(),
 });
 
+export type SupportedLanguage = z.infer<typeof $language>
 export type ParticipantResponse = z.infer<typeof $participantResponse>;
 export type Trial = z.infer<typeof $trial>;
 export type LoggingTrial = z.infer<typeof $loggingTrial>;

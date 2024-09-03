@@ -1,8 +1,7 @@
 import { experimentSettingsJson as experimentSettings } from "./experimentSettings.ts";
+import { type SupportedLanguage } from "./schemas.ts";
 
 import { createI18Next } from "/runtime/v1/@opendatacapture/runtime-core";
-
-type SupportedLanguage = "en" | "fr";
 
 const i18n = createI18Next({
   translations: {

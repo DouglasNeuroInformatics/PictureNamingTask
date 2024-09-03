@@ -11,6 +11,7 @@ Python3 offers a command to serve the index.html locally with one command. First
 Using a terminal or powershell first navitage to the directory containing the index.html file then:
 
 .. code-block:: console
+
   cd path/to/directory/containing/index.html
   python -m http.server
 
@@ -63,18 +64,46 @@ These settings are described below:
 - numberOfLevels <number>: the number of levels that are available for the task
 
 .. csv-table:: experimentSettings :rst:dir:`csv-table`
-   :header: totalNumberOfTrialsToRun, advancementSchedule, regressionSchedule, language, seed, initialDifficulty, numberOfLevels,
-   5, 2, 0, en, 42, 1, 9
+   :header: totalNumberOfTrialsToRun, advancementSchedule, regressionSchedule, language, seed, initialDifficulty, numberOfLevels, downloadOnFinish
+   5, 2, 0, en, 42, 1, 9, false
 
 .. _adding-additional-languge:
 
 Adding additional language
 --------------------------
 
-Adding additional languages can be accomplished by accessing the `locales` directory in `dist/assets` and adding a `translation.json` for the language of interest. 
-`translation.json` must be placed in a `locales/XX/` directory where `XX` is the two letter language code for the language of interest. 
-Images with the corresponding language code must be included in the `data.csv` as per :ref:`adding-stimuli`.
+Adding additional languages can be accomplished by accessing the `i18n.ts` file.
+This file provides the translations for the task. 
+To add another language two things must be done. 
+- Adding the translated text the 10 keys in the `translation` json object on lines 8 through 48
+- Adding the two-letter lanague code to `const $language = z.enum(["en", "fr"]);` found on line 4 of `schema.ts`
 
+For example adding spanish would look like this:
+
+.. code-block:: typescript
+   // i18n.ts
+  const i18n = createI18Next({
+  translations: {
+    welcome: {
+      en: "Welcome. Press any key to begin",
+      fr: "Bienvenue. Appuyez sur n'importe quelle touche pour commencer",
+      es: "Bienvenido. Presione cualquier tecla para comenzar",
+    },
+    //  ...
+    //  other tranlations 
+    //  ...
+    submit: {
+      en: "Submit",
+      fr: "Soumettre",
+      es: "Entregar",
+    },
+   },
+  });
+
+.. code-block:: typescript
+   // schema.ts
+  import { z } from "/runtime/v1/zod@3.23.x";
+  const $language = z.enum(["en", "fr", "es"]);
 
 
 

@@ -1,5 +1,5 @@
 import { experimentSettingsJson } from "./experimentSettings.ts";
-import { setUseJsonToTrue, useJson } from "./globalState.ts";
+import { useJsonState } from "./globalState.ts";
 import { pictureNamingTask } from "./pictureNamingTask.ts";
 import { $ExperimentResults } from "./schemas.ts";
 
@@ -9,8 +9,10 @@ import "/runtime/v1/jspsych@8.x/css/jspsych.css";
 
 import { defineInstrument } from "/runtime/v1/@opendatacapture/runtime-core";
 
-if (!useJson) {
-  setUseJsonToTrue();
+// the ODC playground uses the index.ts file while deploying locally used main.ts
+// this next block allows the program to read from the json rather than the csv files
+if (!useJsonState.value) {
+  useJsonState.set = true;
 }
 
 export default defineInstrument({
@@ -22,8 +24,8 @@ export default defineInstrument({
   },
   tags: ["interactive", "jsPysch", "PictureNamingTask"],
   content: {
-    render(done) {
-      pictureNamingTask(done);
+    async render(done) {
+      await pictureNamingTask(done);
     },
   },
   details: {

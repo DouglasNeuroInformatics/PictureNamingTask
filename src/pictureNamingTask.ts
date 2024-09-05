@@ -3,7 +3,7 @@ import type { Language } from "@opendatacapture/runtime-v1/@opendatacapture/runt
 import { transformAndDownload, transformAndExportJson } from "./dataMunger.ts";
 import { experimentSettingsJson } from "./experimentSettings.ts";
 import { experimentSettingsCSV, imageDbCSV } from "./fetchAndParse.ts";
-import { useJson } from "./globalState.ts";
+import { useJsonState } from "./globalState.ts";
 import i18n from "./i18n.ts";
 import {
   $ExperimentImage,
@@ -39,7 +39,7 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
   let settingsParseResult;
   let imageDBParseResult;
 
-  if (useJson) {
+  if (useJsonState.value) {
     settingsParseResult = $Settings.safeParse(experimentSettingsJson);
     imageDBParseResult = $ExperimentImage.array().safeParse(stimuliPaths);
   } else {

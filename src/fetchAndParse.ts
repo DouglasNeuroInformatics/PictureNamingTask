@@ -1,23 +1,6 @@
-import Papa from "papaparse";
+import type { ExperimentImage, Settings } from "./schemas.ts";
 
-import "./style.css";
-
-export type ExperimentImage = {
-  correctResponse: string;
-  difficultyLevel: number;
-  language: string;
-  stimulus: string;
-};
-
-type Settings = {
-  advancementSchedule: number;
-  initialDifficulty: number;
-  language: string;
-  numberOfLevels: number;
-  regressionSchedule: number;
-  seed: number;
-  totalNumberOfTrialsToRun: number;
-};
+import Papa from "/runtime/v1/papaparse@5.x";
 
 async function fetchAndParse(path: string) {
   // main.ts has logic to make sure the files exist
@@ -26,7 +9,7 @@ async function fetchAndParse(path: string) {
     method: "GET",
   });
   const responseText = await response.text();
-  const data = Papa.parse(responseText, { header: true });
+  const data = Papa.parse(responseText, { header: true, skipEmptyLines: true });
   return data;
 }
 
@@ -37,7 +20,8 @@ const experimentSettingsPath = baseUrl + "experimentSettings.csv";
 
 const parsedImageDB = await fetchAndParse(dataPath);
 const parsedExperimentSettings = await fetchAndParse(experimentSettingsPath);
-const experimentSettings = parsedExperimentSettings.data[0] as Settings;
-const imageDB = parsedImageDB.data as ExperimentImage[];
+const experimentSettingsCSV = parsedExperimentSettings.data[0] as Settings;
+const imageDbCSV = parsedImageDB.data as ExperimentImage[];
 
-export { experimentSettings, imageDB };
+
+export { experimentSettingsCSV, imageDbCSV };

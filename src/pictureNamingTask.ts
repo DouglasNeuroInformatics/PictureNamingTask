@@ -1,125 +1,178 @@
-import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
-import ImageKeyboardResponsePlugin from "@jspsych/plugin-image-keyboard-response";
-import PreloadPlugin from "@jspsych/plugin-preload";
-import SurveyHtmlFormPlugin from "@jspsych/plugin-survey-html-form";
-import DOMPurify from "dompurify";
-import { JsPsych, initJsPsych } from "jspsych";
-import prand from "pure-rand";
+import type { Language } from "@opendatacapture/runtime-v1/@opendatacapture/runtime-core/index.js";
 
-import { transformAndDownload } from "./dataMunger";
-import { experimentSettings } from "./fetchAndParse";
-import { imageDB } from "./fetchAndParse";
-import i18n from "./services/i18n";
+import { transformAndDownload, transformAndExportJson } from "./dataMunger.ts";
+import { experimentSettingsJson } from "./experimentSettings.ts";
+import { experimentSettingsCSV, imageDbCSV } from "./fetchAndParse.ts";
+import { useJsonState } from "./globalState.ts";
+import i18n from "./i18n.ts";
+import {
+  $ExperimentImage,
+  $Settings,
+  type ExperimentImage,
+  type LoggingTrial,
+  type ParticipantResponse,
+} from "./schemas.ts";
+import { stimuliPaths } from "./stimuliPaths.ts";
 
-import type { LoggingTrial } from "./dataMunger";
-import type { ParticipantResponse } from "./dataMunger";
-import type { ExperimentImage } from "./fetchAndParse";
+import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x";
+import { ImageKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x";
+import { PreloadPlugin } from "/runtime/v1/@jspsych/plugin-preload@2.x";
+import { SurveyHtmlFormPlugin } from "/runtime/v1/@jspsych/plugin-survey-html-form@2.x";
+import { DOMPurify } from "/runtime/v1/dompurify@3.x";
+import { initJsPsych } from "/runtime/v1/jspsych@8.x";
+import { JsPsych } from "/runtime/v1/jspsych@8.x";
+import {
+  uniformIntDistribution,
+  xoroshiro128plus,
+} from "/runtime/v1/pure-rand@6.x";
 
-import "jspsych/css/jspsych.css";
+export async function pictureNamingTask(onFinish?: (data: any) => void) {
+  //****************************
+  //****EXPERIMENT_SETTINGS*****
+  //****************************
+  // variables for controlling advancementSchedule, regressionSchedule, and when the experiment is finished
+  //
+  // can be read from either the csv files in public/ or via json if using the instrument playground
 
+  let numberOfCorrectAnswers = 0;
+  let numberOfTrialsRun = 1;
+  let settingsParseResult;
+  let imageDBParseResult;
 
-//****************************
-//****EXPERIMENT_SETTINGS*****
-//****************************
-// variables for controlling advancementSchedule, regressionSchedule, and when the experiment is finished
-let numberOfCorrectAnswers = 0;
-let numberOfTrialsRun = 1;
-const totalNumberOfTrialsToRun = Number(
-  experimentSettings.totalNumberOfTrialsToRun,
-);
-let advancementSchedule = Number(experimentSettings.advancementSchedule);
-let regressionSchedule = Number(experimentSettings.regressionSchedule);
-let { language, numberOfLevels, seed } = experimentSettings;
+  if (useJsonState.value) {
+    settingsParseResult = $Settings.safeParse(experimentSettingsJson);
+    imageDBParseResult = $ExperimentImage.array().safeParse(stimuliPaths);
+  } else {
+    settingsParseResult = $Settings.safeParse(experimentSettingsCSV);
+    imageDBParseResult = $ExperimentImage.array().safeParse(imageDbCSV);
+  }
 
-/*
+  if (!settingsParseResult.success) {
+    throw new Error("validation error, check experiment settings", {
+      cause: settingsParseResult.error,
+    });
+  }
+  if (!imageDBParseResult.success) {
+    throw new Error("validation error, check imageDB", {
+      cause: imageDBParseResult.error,
+    });
+  }
+  const imageDB = imageDBParseResult.data;
+  const {
+    totalNumberOfTrialsToRun,
+    advancementSchedule,
+    regressionSchedule,
+    language,
+    numberOfLevels,
+    seed,
+    downloadOnFinish,
+    initialDifficulty,
+  } = settingsParseResult.data;
+
+  // small hack to get around i18n issues with wait for changeLanguage
+  i18n.changeLanguage(language as Language);
+  await new Promise(function (resolve) {
+    i18n.onLanguageChange = resolve;
+  });
+
+  /*
 functions for generating
 experimentStimuli
 */
 
-const indiciesSelected = new Set();
-let rng = prand.xoroshiro128plus(seed);
+  const indiciesSelected = new Set();
+  let rng = xoroshiro128plus(seed);
 
-// closure
-function getRandomElementWithSeed(array: ExperimentImage[]): ExperimentImage[] {
-  let randomIndex: number;
-  let foundUnique = false;
+  // closure
+  function getRandomElementWithSeed(
+    array: ExperimentImage[],
+  ): ExperimentImage[] {
+    let randomIndex: number;
+    let foundUnique = false;
 
-  // if all images have been shown clear the set
-  if (indiciesSelected.size === array.length) {
-    indiciesSelected.clear();
-  }
-
-  do {
-    const [newRandomIndex, newRng] = prand.uniformIntDistribution(
-      0,
-      array.length - 1,
-      rng,
-    );
-    rng = newRng;
-    randomIndex = newRandomIndex;
-
-    if (!indiciesSelected.has(randomIndex)) {
-      indiciesSelected.add(randomIndex);
-      foundUnique = true;
+    // if all images have been shown clear the set
+    if (indiciesSelected.size === array.length) {
+      indiciesSelected.clear();
     }
-  } while (!foundUnique);
 
-  const result = [array[randomIndex]!];
-  return result;
-}
+    do {
+      const [newRandomIndex, newRng] = uniformIntDistribution(
+        0,
+        array.length - 1,
+        rng,
+      );
+      rng = newRng;
+      randomIndex = newRandomIndex;
 
-// draw an image at random from the bank depending on the difficulty_level selected
-// closure
-function createStimuli(
-  difficultyLevel: number,
-  language: string,
-  clearSet: boolean,
-): ExperimentImage[] {
-  if (clearSet === true) {
-    indiciesSelected.clear();
+      if (!indiciesSelected.has(randomIndex)) {
+        indiciesSelected.add(randomIndex);
+        foundUnique = true;
+      }
+    } while (!foundUnique);
+
+    const result = [array[randomIndex]!];
+    return result;
   }
-  let imgList: ExperimentImage[] = imageDB.filter(
-    (image) =>
-      Number(image.difficultyLevel) === difficultyLevel &&
-      image.language === language,
-  );
-  let result = getRandomElementWithSeed(imgList);
-  return result;
-}
 
-// to handle clicks on a touchscreen as a keyboard response 
+  // draw an image at random from the bank depending on the difficulty_level selected
+  // closure
+  function createStimuli(
+    difficultyLevel: number,
+    language: string,
+    clearSet: boolean,
+  ): ExperimentImage[] {
+    if (clearSet === true) {
+      indiciesSelected.clear();
+    }
+    let imgList: ExperimentImage[] = imageDB.filter(
+      (image) =>
+        image.difficultyLevel === difficultyLevel &&
+        image.language === language,
+    );
+    let result = getRandomElementWithSeed(imgList);
+    return result;
+  }
 
-function simulateKeyPress(jsPsych: JsPsych, key: string) {
-  jsPsych.pluginAPI.keyDown(key)
-  jsPsych.pluginAPI.keyUp(key)
-}
+  // to handle clicks on a touchscreen as a keyboard response
 
-//****************************
-//********EXPERIMENT**********
-//****************************
-// a timeline is a set of trials
-// a trial is a single object eg htmlKeyboardResponse etc ...
-// @ts-expect-error the trials have different structures
-const timeline = [];
-export default function pictureNamingTask(difficultyLevelParam: number) {
-  let experimentStimuli = createStimuli(difficultyLevelParam, language, false);
-  let currentDifficultyLevel = difficultyLevelParam;
-  if (difficultyLevelParam) {
+  function simulateKeyPress(jsPsych: JsPsych, key: string) {
+    jsPsych.pluginAPI.keyDown(key);
+    jsPsych.pluginAPI.keyUp(key);
+  }
+
+  //****************************
+  //********EXPERIMENT**********
+  //****************************
+  // a timeline is a set of trials
+  // a trial is a single object eg htmlKeyboardResponse etc ...
+  const timeline: any[] = [];
+
+  (function () {
+    let experimentStimuli = createStimuli(initialDifficulty, language, false);
+    let currentDifficultyLevel = initialDifficulty;
     const jsPsych = initJsPsych({
-      on_finish: function() {
+      on_finish: function () {
         const data = jsPsych.data.get();
-        transformAndDownload(data);
+        if (downloadOnFinish) {
+          transformAndDownload(data);
+        }
+        if (onFinish) {
+          onFinish(transformAndExportJson(data));
+        }
       },
     });
 
     const welcome = {
-      on_start: function() {
-        document.addEventListener('click', () => simulateKeyPress(jsPsych, 'a'), { once: true })
+      on_start: function () {
+        document.addEventListener(
+          "click",
+          () => simulateKeyPress(jsPsych, "a"),
+          { once: true },
+        );
       },
       stimulus: i18n.t("welcome"),
       type: HtmlKeyboardResponsePlugin,
     };
-
 
     const preload = {
       auto_preload: true,
@@ -129,15 +182,23 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     };
 
     const blankPage = {
-      on_start: function() {
-        document.addEventListener('click', () => simulateKeyPress(jsPsych, 'a'), { once: true })
+      on_start: function () {
+        document.addEventListener(
+          "click",
+          () => simulateKeyPress(jsPsych, "a"),
+          { once: true },
+        );
       },
       stimulus: "",
       type: HtmlKeyboardResponsePlugin,
     };
     const showImg = {
-      on_start: function() {
-        document.addEventListener('click', () => simulateKeyPress(jsPsych, 'a'), { once: true })
+      on_start: function () {
+        document.addEventListener(
+          "click",
+          () => simulateKeyPress(jsPsych, "a"),
+          { once: true },
+        );
       },
       stimulus: jsPsych.timelineVariable("stimulus"),
       stimulus_height: 600,
@@ -148,11 +209,12 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
       autofocus: "textBox",
       button_label: i18n.t("submit"),
       data: {
+        stimulus: jsPsych.timelineVariable("stimulus"),
         correctResponse: jsPsych.timelineVariable("correctResponse"),
         difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
         language: jsPsych.timelineVariable("language"),
       },
-      html: function() {
+      html: function () {
         const html = `
           <h3>${i18n.t("logResponse")}</h3>
           <input type="button" value="${i18n.t("correct")}" onclick="document.getElementById('result').value='${i18n.t("correct")}';">
@@ -162,25 +224,26 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
           <input type="text" id="result" name="result" readonly>
           <hr>
           <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
-          <p>${i18n.t("logResponseToContinue")}</p>`
-        return html
+          <p>${i18n.t("logResponseToContinue")}</p>`;
+        return html;
       },
-      on_load: function() {
-
-        const submitButton = document.getElementById('jspsych-survey-html-form-next') as HTMLButtonElement
-        const resultInput = document.getElementById('result') as HTMLInputElement
-        submitButton.disabled = true
-        document.querySelectorAll('input[type="button"]').forEach(button => {
-          button.addEventListener('click', () => {
-            if (resultInput.value !== '') {
+      on_load: function () {
+        const submitButton = document.getElementById(
+          "jspsych-survey-html-form-next",
+        ) as HTMLButtonElement;
+        const resultInput = document.getElementById(
+          "result",
+        ) as HTMLInputElement;
+        submitButton.disabled = true;
+        document.querySelectorAll('input[type="button"]').forEach((button) => {
+          button.addEventListener("click", () => {
+            if (resultInput.value !== "") {
               submitButton.disabled = false;
             }
           });
         });
-
-
       },
-      preamble: function() {
+      preamble: function () {
         const html = `<h3>${i18n.t("correctResponse")}</h3>
                     <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>
                     <img src="${jsPsych.evaluateTimelineVariable("stimulus")}" width="300" height="300">`;
@@ -190,7 +253,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     };
     const testProcedure = {
       // to reload the experimentStimuli after one repetition has been completed
-      on_timeline_start: function() {
+      on_timeline_start: function () {
         this.timeline_variables = experimentStimuli;
       },
       timeline: [preload, blankPage, showImg, blankPage, logging],
@@ -199,7 +262,7 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
     timeline.push(testProcedure);
 
     const loop_node = {
-      loop_function: function() {
+      loop_function: function () {
         // tracking number of corret answers
         // need to access logging trial info
         let clearSet = false;
@@ -210,8 +273,8 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
         // getting the most recent logged result
         const loggingResponseArray = jsPsych.data
           .get()
-          // @ts-expect-error .trials is private to DataCollection
-          .filter({ trial_type: "survey-html-form" }).trials as LoggingTrial[];
+          .filter({ trial_type: "survey-html-form" })
+          .values() as LoggingTrial[];
         const lastTrialIndex = loggingResponseArray.length - 1;
 
         const lastTrialResults: ParticipantResponse =
@@ -244,9 +307,8 @@ export default function pictureNamingTask(difficultyLevelParam: number) {
         numberOfTrialsRun++;
         return true;
       },
-      //@ts-expect-error timeline contains trials of different structures
       timeline,
     };
     void jsPsych.run([welcome, loop_node]);
-  }
+  })();
 }

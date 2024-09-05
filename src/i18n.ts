@@ -1,7 +1,6 @@
-import { experimentSettingsJson as experimentSettings } from "./experimentSettings.ts";
-import { type SupportedLanguage } from "./schemas.ts";
-
 import { createI18Next } from "/runtime/v1/@opendatacapture/runtime-core";
+
+document.documentElement.setAttribute("lang", "en");
 
 const i18n = createI18Next({
   translations: {
@@ -47,6 +46,9 @@ const i18n = createI18Next({
     },
   },
 });
-
-i18n.changeLanguage(experimentSettings.language as SupportedLanguage);
+// the whole i18n implementation needs to be changed
+document.addEventListener("changeLanguage", function (event) {
+  // @ts-expect-error the event does have a detail
+  document.documentElement.setAttribute("lang", event.detail as string);
+});
 export default i18n;

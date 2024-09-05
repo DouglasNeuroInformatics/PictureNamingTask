@@ -55,7 +55,6 @@ void (async () => {
     throw new Error("Failed to fetch and parse the experimentSettings.csv.");
   }
   if (parsedImageDB && parsedExperimentSettings) {
-
     pictureNamingTask();
   }
 })();

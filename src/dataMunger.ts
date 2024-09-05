@@ -1,4 +1,4 @@
-import { $experimentResults } from "./schemas.ts";
+import { $ExperimentResults } from "./schemas.ts";
 
 import type { ExperimentResults, LoggingTrial } from "./schemas.ts";
 import type { DataCollection } from "/runtime/v1/jspsych@8.x";
@@ -11,7 +11,7 @@ function dataMunger(data: DataCollection) {
     .values() as LoggingTrial[];
   const experimentResults: ExperimentResults[] = [];
   for (let trial of trials) {
-    const result = $experimentResults.parse({
+    const result = $ExperimentResults.parse({
       stimulus: trial.stimulus,
       correctResponse: trial.correctResponse,
       difficultyLevel: trial.difficultyLevel,

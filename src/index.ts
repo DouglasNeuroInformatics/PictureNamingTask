@@ -1,7 +1,7 @@
 import { experimentSettingsJson } from "./experimentSettings.ts";
 import { setUseJsonToTrue, useJson } from "./globalState.ts";
 import { pictureNamingTask } from "./pictureNamingTask.ts";
-import { $experimentResults } from "./schemas.ts";
+import { $ExperimentResults } from "./schemas.ts";
 
 import type { Language } from "/runtime/v1/@opendatacapture/runtime-core";
 
@@ -34,5 +34,5 @@ export default defineInstrument({
     title: "Picture Naming Task",
   },
   measures: {},
-  validationSchema: $experimentResults,
+  validationSchema: $ExperimentResults,
 });

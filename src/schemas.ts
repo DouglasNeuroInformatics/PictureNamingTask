@@ -1,30 +1,30 @@
 import { z } from "/runtime/v1/zod@3.23.x";
 
-const $language = z.enum(["en", "fr"]);
+const $Language = z.enum(["en", "fr"]);
 
-const $participantResponse = z.object({
+const $ParticipantResponse = z.object({
   notes: z.string(),
   result: z.string(),
 });
-const $trial = z.object({
+const $Trial = z.object({
   trialType: z.string(),
 });
-const $loggingTrial = $trial.extend({
+const $LoggingTrial = $Trial.extend({
   correctResponse: z.string(),
   difficultyLevel: z.coerce.number().positive().int(),
-  language: $language,
-  response: $participantResponse,
+  language: $Language,
+  response: $ParticipantResponse,
   rt: z.coerce.number().positive().int(),
   stimulus: z.string(),
 });
-export const $experimentResults = $loggingTrial
+export const $ExperimentResults = $LoggingTrial
   .omit({ response: true, trialType: true })
   .extend({
     responseNotes: z.string(),
     responseResult: z.string(),
   });
 
-export const $settings = z.object({
+export const $Settings = z.object({
   advancementSchedule: z.coerce.number().positive().int(),
   downloadOnFinish: z.coerce.boolean(),
   initialDifficulty: z.coerce.number().positive().int(),
@@ -35,17 +35,17 @@ export const $settings = z.object({
   totalNumberOfTrialsToRun: z.coerce.number().positive().int(),
 });
 
-export const $experimentImage = z.object({
+export const $ExperimentImage = z.object({
   correctResponse: z.string(),
   difficultyLevel: z.coerce.number().positive().int(),
   language: z.string(),
   stimulus: z.string(),
 });
 
-export type SupportedLanguage = z.infer<typeof $language>;
-export type ParticipantResponse = z.infer<typeof $participantResponse>;
-export type Trial = z.infer<typeof $trial>;
-export type LoggingTrial = z.infer<typeof $loggingTrial>;
-export type ExperimentResults = z.infer<typeof $experimentResults>;
-export type Settings = z.infer<typeof $settings>;
-export type ExperimentImage = z.infer<typeof $experimentImage>;
+export type SupportedLanguage = z.infer<typeof $Language>;
+export type ParticipantResponse = z.infer<typeof $ParticipantResponse>;
+export type Trial = z.infer<typeof $Trial>;
+export type LoggingTrial = z.infer<typeof $LoggingTrial>;
+export type ExperimentResults = z.infer<typeof $ExperimentResults>;
+export type Settings = z.infer<typeof $Settings>;
+export type ExperimentImage = z.infer<typeof $ExperimentImage>;

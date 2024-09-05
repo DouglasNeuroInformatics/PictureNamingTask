@@ -6,8 +6,8 @@ import { experimentSettingsCSV, imageDbCSV } from "./fetchAndParse.ts";
 import { useJson } from "./globalState.ts";
 import i18n from "./i18n.ts";
 import {
-  $experimentImage,
-  $settings,
+  $ExperimentImage,
+  $Settings,
   type ExperimentImage,
   type LoggingTrial,
   type ParticipantResponse,
@@ -40,11 +40,11 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
   let imageDBParseResult;
 
   if (useJson) {
-    settingsParseResult = $settings.safeParse(experimentSettingsJson);
-    imageDBParseResult = $experimentImage.array().safeParse(stimuliPaths);
+    settingsParseResult = $Settings.safeParse(experimentSettingsJson);
+    imageDBParseResult = $ExperimentImage.array().safeParse(stimuliPaths);
   } else {
-    settingsParseResult = $settings.safeParse(experimentSettingsCSV);
-    imageDBParseResult = $experimentImage.array().safeParse(imageDbCSV);
+    settingsParseResult = $Settings.safeParse(experimentSettingsCSV);
+    imageDBParseResult = $ExperimentImage.array().safeParse(imageDbCSV);
   }
 
   if (!settingsParseResult.success) {

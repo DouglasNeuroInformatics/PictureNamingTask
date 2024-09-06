@@ -39,7 +39,7 @@ Adding stimuli
 
 Stimuli are added to the data.csv found in the `dist/assets` directory as follows:
 
-.. csv-table:: stimuli :rst:dir:`csv-table`
+.. csv-table:: stimuli :rst:dir:
    :header: "stimulus", "difficultyLevel", "correctResponse","language"
 
    "path/to/img_of_a_dog.jpg",    "1",      "A dog",          "en"

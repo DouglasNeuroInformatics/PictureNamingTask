@@ -30,7 +30,7 @@ They are supplied to the instrument in `.json` format.
 See below for an example:
 
 .. csv-table:: stimuli :rst:dir:
-   :header: "key", "value" 
+  :header: "key", "value" 
 
   "stimulus", "https://raw.githubusercontent.com/DouglasNeuroInformatics/PictureNamingTask/main/public/level1/addressplate.jpg" 
   "difficultyLevel", "1"
@@ -49,11 +49,11 @@ These settings are described below:
 - **totalNumberOfTrialsToRun** <number>: this is the number of images to be shown
 - **advancementSchedule** <number>: the number of correct answers that are required to increase the difficulty level by one
 - **regressionSchedule** <number>: the number of incorrect answers required to decrease the difficulty level by one
-- **language **<'en' or 'fr'>: the language of experiment, currently `en` or `fr`
+- **language**<'en' or 'fr'>: the language of experiment, currently `en` or `fr`
 - **seed** <number>: a seed for the psuedorandom number generator
 - **initialDifficulty** <number>: the difficulty that the task will start with
 - **numberOfLevels** <number>: the number of levels that are available for the task
-- **downloadOnFinish ** <`true` or `false`>: If set to true will download a copy of the data as .csv file in addition to saving the data in ODC
+- **downloadOnFinish** <`true` or `false`>: If set to true will download a copy of the data as .csv file in addition to saving the data in ODC
 
 .. csv-table:: experimentSettings :rst:dir:`csv-table`
    :header: totalNumberOfTrialsToRun, advancementSchedule, regressionSchedule, language, seed, initialDifficulty, numberOfLevels, downloadOnFinish

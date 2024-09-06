@@ -72,6 +72,8 @@ These settings are described below:
 Adding additional language
 --------------------------
 
+**The backend does not allow for additional languages yet.**
+
 Adding additional languages can be accomplished by accessing the `i18n.ts` file.
 This file provides the translations for the task. 
 To add another language two things must be done. 

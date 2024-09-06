@@ -1,4 +1,4 @@
-Usage
+UsageODC
 =====
 
 .. _installation:
@@ -28,18 +28,16 @@ They are supplied to the instrument in `.json` format.
 
 
 See below for an example:
-+------------------+---------------------------------------------------------------------------------------------+
-| Key              | Value                                                                                       |
-+==================+=============================================================================================+
-| stimulus         | https://raw.githubusercontent.com/DouglasNeuroInformatics/PictureNamingTask/main/public/    |
-|                  | level1/addressplate.jpg                                                                     |
-+------------------+---------------------------------------------------------------------------------------------+
-| difficultyLevel  | 1                                                                                           |
-+------------------+---------------------------------------------------------------------------------------------+
-| correctResponse  | addressplate                                                                                |
-+------------------+---------------------------------------------------------------------------------------------+
-| language         | en                                                                                          |
-+------------------+---------------------------------------------------------------------------------------------+
+
+.. table::  stimuliPaths.ts example
+  :widths: auto
+  =============== =========
+  Key             Value
+  =============== =========
+  stimulus        https://raw.githubusercontent.com/DouglasNeuroInformatics/PictureNamingTask/main/public/level1/addressplate.jpg
+  difficultyLevel 1
+  correctResponse addressplate
+  language        en
 
 .. _changing-experiment-settings:
 
@@ -67,6 +65,8 @@ These settings are described below:
 
 Adding additional language
 --------------------------
+
+**The backend does not allow for additional languages yet.**
 
 Adding additional languages can be accomplished by accessing the `i18n.ts` file.
 This file provides the translations for the task. 

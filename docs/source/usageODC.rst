@@ -22,14 +22,14 @@ Stimuli are added to the ``stimuliPaths.ts``.
 They are supplied to the instrument in ``.json`` format. 
 The key-value pairs below are required:
 
-- stimulus <string>: This is a url to where the image is hosted
+- stimulus <string>: This is a URL to where the image is hosted
 - difficultyLevel <number>: The difficultyLevel associated with the image
 - correctResponse <string>: The response expected from the participant. This will also be displayed to the task administrator when they are administering the task
-- language <string>: The two letter code corresponding to the language tha the image is intended for, currently ``"en"`` or ``"fr"`` 
+- language <string>: The two letter code corresponding to the language that the image is intended for, currently ``"en"`` or ``"fr"`` 
 
 Below is an example of how to populate the ``stimuliPaths.ts``:
 
-.. :: typescript
+.. code-block:: typescript
   
   // stimuliPaths.ts
   const stimuliPaths = [
@@ -50,7 +50,7 @@ These settings are described below:
 - **totalNumberOfTrialsToRun** <number>: this is the number of images to be shown
 - **advancementSchedule** <number>: the number of correct answers that are required to increase the difficulty level by one
 - **regressionSchedule** <number>: the number of incorrect answers required to decrease the difficulty level by one
-- **language**<'en' or 'fr'>: the language of experiment, currently ``en`` or ``fr``
+- **language** <``"en"`` or ``"fr"``>: the language of experiment 
 - **seed** <number>: a seed for the psuedorandom number generator
 - **initialDifficulty** <number>: the difficulty that the task will start with
 - **numberOfLevels** <number>: the number of levels that are available for the task
@@ -59,46 +59,4 @@ These settings are described below:
 .. csv-table:: experimentSettings :rst:dir:`csv-table`
    :header: totalNumberOfTrialsToRun, advancementSchedule, regressionSchedule, language, seed, initialDifficulty, numberOfLevels, downloadOnFinish
    5, 2, 0, en, 42, 1, 9, false
-
-.. _adding-additional-languge:
-
-Adding additional language
---------------------------
-
-Adding additional languages can be accomplished by accessing the ``i18n.ts`` file.
-This file provides the translations for the task. 
-To add another language two things must be done. 
-- Adding the translated text the to the 10 keys in the ``translation`` json object on lines 8 through 48
-- Adding the two-letter language code to ``const $language = z.enum(["en", "fr"]);`` found on line 4 of ``schema.ts``
-
-For example adding spanish would look like this:
-
-.. code-block:: typescript
-
-   // i18n.ts
-  const i18n = createI18Next({
-  translations: {
-    welcome: {
-      en: "Welcome. Press any key to begin",
-      fr: "Bienvenue. Appuyez sur n'importe quelle touche pour commencer",
-      es: "Bienvenido. Presione cualquier tecla para comenzar",
-    },
-    //  ...
-    //  other translations 
-    //  ...
-    submit: {
-      en: "Submit",
-      fr: "Soumettre",
-      es: "Entregar",
-    },
-   },
-  });
-
-.. code-block:: typescript
-
-   // schema.ts
-  import { z } from "/runtime/v1/zod@3.23.x";
-  const $language = z.enum(["en", "fr", "es"]);
-
-
 

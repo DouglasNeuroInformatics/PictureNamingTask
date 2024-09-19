@@ -7,7 +7,7 @@ Classically, the number correct and the answer provided are recorded as a measur
 This expands on the classic version by allowing a user to add and remove stimuli as they deem necessary.
 Each stimulus also has a difficulty level associated with it. This allows for dynamic advancement and regression according to schedule set by the task administrator. 
 
-The following pieces of data are recorded and downloaded in a .csv file at the end of session:
+The following pieces of data are recorded and downloaded in a .csv file at the end of session or sent to Open Data Capture:
 
 - The stimulus
 - The correct response
@@ -22,12 +22,9 @@ Check out the :doc:`usage` section for further information, including
 how to :ref:`installation` the project.
 
 
-Contents
---------
-
 .. toctree::
-  
-  index
+  :caption: Contents
+
   usage
   usageODC
   language

@@ -41,7 +41,7 @@ More information about ``python http.server`` can be found here https://docs.pyt
 Adding stimuli
 ----------------
 
-Stimuli are added to the data.csv found in the `dist/assets` directory as follows:
+Stimuli are added to the data.csv found in the ``dist/assets`` directory as follows:
 
 .. csv-table:: data.csv 
    :header: "stimulus", "difficultyLevel", "correctResponse","language"
@@ -56,7 +56,7 @@ Stimuli are added to the data.csv found in the `dist/assets` directory as follow
 Changing experiment settings
 ----------------------------
 
-Experiment settings are changed in the experimentSettings.csv file which is located in the `dist/assets` directory.
+Experiment settings are changed in the experimentSettings.csv file which is located in the ``dist/assets`` directory.
 A template for this file can be found in the ``public`` directory: `public/experimentSettings  <https://github.com/DouglasNeuroInformatics/PictureNamingTask/blob/main/public/experimentSettings.csv>`_
 These settings are described below:
 
@@ -96,7 +96,7 @@ For example adding spanish would look like this:
       es: "Bienvenido. Presione cualquier tecla para comenzar",
     },
     //  ...
-    //  other tranlations 
+    //  other translations 
     //  ...
     submit: {
       en: "Submit",

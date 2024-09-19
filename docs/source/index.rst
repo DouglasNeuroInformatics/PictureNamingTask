@@ -28,7 +28,5 @@ Contents
 .. toctree::
   
   index
-  usage
-  usageODC
 
 

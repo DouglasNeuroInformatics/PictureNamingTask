@@ -20,22 +20,23 @@ Adding stimuli
 
 Stimuli are added to the ``stimuliPaths.ts``. 
 They are supplied to the instrument in ``.json`` format. 
+The key-value pairs below are required:
 
-- stimulus: This is a url to where the image is hosted
-- difficultyLevel: The difficultyLevel associated with the image
-- correctResponse: The response expected from the participant. This will also be displayed to the task administrator when they are administering the task
-- language: The language for the image
+- stimulus <string>: This is a url to where the image is hosted
+- difficultyLevel <number>: The difficultyLevel associated with the image
+- correctResponse <string>: The response expected from the participant. This will also be displayed to the task administrator when they are administering the task
+- language <string>: The two letter code corresponding to the language tha the image is intended for, currently ``"en"`` or ``"fr"`` 
 
+Below is an example of how to populate the ``stimuliPaths.ts``:
 
-See below for an example:
-
-.. csv-table:: stimuliPaths.ts
-  :header: "key", "value" 
-
-  "stimulus", "https://raw.githubusercontent.com/DouglasNeuroInformatics/PictureNamingTask/main/public/level1/addressplate.jpg" 
-  "difficultyLevel", "1"
-  "correctResponse ", "addressplate"
-  "language", "en"
+.. :: typescript
+  
+  // stimuliPaths.ts
+  const stimuliPaths = [
+   {"stimulus":"path/to/1st/jpg", "difficultyLevel": 1, "correctResponse": "1stImage.jpg", "language":"en"},
+   {"stimulus":"path/to/2nd/jpg", "difficultyLevel": 2, "correctResponse": "2ndImage.jpg", "language":"en"},
+   {"stimulus":"path/to/3rd/jpg", "difficultyLevel": 3, "correctResponse": "3rdImage.jpg", "language":"en"},
+   ]
 
 .. _changing-experiment-settings:
 
@@ -68,7 +69,7 @@ Adding additional languages can be accomplished by accessing the ``i18n.ts`` fil
 This file provides the translations for the task. 
 To add another language two things must be done. 
 - Adding the translated text the to the 10 keys in the ``translation`` json object on lines 8 through 48
-- Adding the two-letter lanague code to ``const $language = z.enum(["en", "fr"]);`` found on line 4 of ``schema.ts``
+- Adding the two-letter language code to ``const $language = z.enum(["en", "fr"]);`` found on line 4 of ``schema.ts``
 
 For example adding spanish would look like this:
 

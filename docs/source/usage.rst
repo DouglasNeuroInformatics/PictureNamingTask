@@ -81,7 +81,7 @@ Adding additional languages can be accomplished by accessing the ``i18n.ts`` fil
 This file provides the translations for the task. 
 To add another language two things must be done. 
 - Adding the translated text the to the 10 keys in the ``translation`` json object on lines 8 through 48
-- Adding the two-letter lanague code to ``const $language = z.enum(["en", "fr"]);`` found on line 4 of ``schema.ts``
+- Adding the two-letter language code to ``const $language = z.enum(["en", "fr"]);`` found on line 4 of ``schema.ts``
 
 For example adding spanish would look like this:
 

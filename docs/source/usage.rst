@@ -54,7 +54,7 @@ Adding stimuli
 
 Stimuli are added to the data.csv found in the ``dist/`` directory as follows:
 
-.. csv-table:: data.csv 
+.. table:: data.csv 
    :header: "stimulus", "difficultyLevel", "correctResponse","language"
 
    "path/to/img_of_a_dog.jpg",    "1",      "A dog",          "en"
@@ -83,7 +83,7 @@ These settings are described below:
 - **initialDifficulty** <number>: the difficulty that the task will start with
 - **numberOfLevels** <number>: the number of levels that are available for the task
 
-.. csv-table:: experimentSettings.csv
+.. table:: experimentSettings.csv
    :header: totalNumberOfTrialsToRun, advancementSchedule, regressionSchedule, language, seed, initialDifficulty, numberOfLevels, downloadOnFinish
    5, 2, 0, en, 42, 1, 9, false
 

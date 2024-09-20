@@ -56,7 +56,7 @@ These settings are described below:
 - **numberOfLevels** <number>: the number of levels that are available for the task
 - **downloadOnFinish** <``true`` or ``false``>: If set to true will download a copy of the data as .csv file in addition to saving the data in ODC
 
-.. csv-table:: experimentSettings :rst:dir:`csv-table`
+.. table:: experimentSettings 
    :header: totalNumberOfTrialsToRun, advancementSchedule, regressionSchedule, language, seed, initialDifficulty, numberOfLevels, downloadOnFinish
    5, 2, 0, en, 42, 1, 9, false
 

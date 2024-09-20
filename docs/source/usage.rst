@@ -54,14 +54,19 @@ Adding stimuli
 
 Stimuli are added to the data.csv found in the ``dist/`` directory as follows:
 
-..table:: Grid table
+.. table:: Grid table
 
-| Stimulus Image Path | Difficulty Level | Correct Response | Language |
-|----------------------|------------------|------------------|----------|
-| path/to/img_of_a_dog.jpg | 1 | A dog | en |
-| path/to/img_of_a_cat.jpg | 2 | A cat | en |
-| path/to/img_of_a_dog.jpg | 1 | Un chien | fr |
-| path/to/img_of_a_cat.jpg | 2 | Un chat | fr |
++---------------------------+------------------+-------------------+----------+
+| Stimulus Image Path       | Difficulty Level | Correct Response  | Language |
++===========================+==================+===================+==========+
+| path/to/img_of_a_dog.jpg  | 1                | A dog             | en       |
++---------------------------+------------------+-------------------+----------+
+| path/to/img_of_a_cat.jpg  | 2                | A cat             | en       |
++---------------------------+------------------+-------------------+----------+
+| path/to/img_of_a_dog.jpg  | 1                | Un chien          | fr       |
++---------------------------+------------------+-------------------+----------+
+| path/to/img_of_a_cat.jpg  | 2                | Un chat           | fr       |
++---------------------------+------------------+-------------------+----------+
 
 Currently there are nine directories with images corresponding to nine difficulty levels. 
 These are located in ``dist/level1 ... dist/level9`` if the ``dist`` was download. 
@@ -84,18 +89,27 @@ These settings are described below:
 - **initialDifficulty** <number>: the difficulty that the task will start with
 - **numberOfLevels** <number>: the number of levels that are available for the task
 
-..table:: Grid table
+.. table:: Grid table
 
-| Setting | Value |
-|---------|--------|
-| totalNumberOfTrialsToRun | 5 |
-| advancementSchedule | 2 |
-| regressionSchedule | 0 |
-| language | en |
-| seed | 42 |
-| initialDifficulty | 1 |
-| numberOfLevels | 9 |
-| downloadOnFinish | False |
++-------------------------+-------+
+| Setting                 | Value |
++=========================+=======+
+| totalNumberOfTrialsToRun| 5     |
++-------------------------+-------+
+| advancementSchedule     | 2     |
++-------------------------+-------+
+| regressionSchedule      | 0     |
++-------------------------+-------+
+| language                | en    |
++-------------------------+-------+
+| seed                    | 42    |
++-------------------------+-------+
+| initialDifficulty       | 1     |
++-------------------------+-------+
+| numberOfLevels          | 9     |
++-------------------------+-------+
+| downloadOnFinish        | False |
++-------------------------+-------+
 
 
 

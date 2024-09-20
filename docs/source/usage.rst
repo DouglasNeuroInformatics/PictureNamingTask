@@ -9,9 +9,8 @@ Serving locally
 To use PictureNamingTask locally a simple http server can be used. 
 There are 2 options available:
 
-- Go to the GitHub repository, download/clone project and build the from source e.g. ``npm build`` to obtain the ``dist`` directory which will contain ``index.html``
-- To obtain the already built files, the dist directory, navigate to the release on the GitHub page and download. ``index.html`` will be present in the ``dist`` directory
-
+- Go to the `GitHub repository <https://github.com/DouglasNeuroInformatics/PictureNamingTask>`_, download/clone project and build the from source e.g. ``npm build`` to obtain the ``dist`` directory which will contain ``index.html``
+- To obtain the already built files, the dist directory, navigate to the `releases <https://github.com/DouglasNeuroInformatics/PictureNamingTask/releases>`_ on the GitHub page and download. ``index.html`` will be present in the ``dist`` directory
 
 The ``index.html`` file can be now be served locally.
 For example Python3 offers a command to serve the ``index.html`` locally with one command. 

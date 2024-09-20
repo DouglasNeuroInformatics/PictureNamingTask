@@ -44,7 +44,7 @@ Changing experiment settings
 ----------------------------
 
 Experiment settings are changed in the experimentSettings.ts file which is located in the PictureNamingTask repository.
-A template for this file can be found at the PictureNamingTask directory: `public/experimentSettings  <https://github.com/DouglasNeuroInformatics/PictureNamingTask/blob/main/experimentSettings.ts>`_
+A template for this file can be found at the PictureNamingTask directory: `experimentSettings.ts <https://github.com/DouglasNeuroInformatics/PictureNamingTask/blob/main/experimentSettings.ts>`_
 These settings are described below:
 
 - **totalNumberOfTrialsToRun** <number>: this is the number of images to be shown

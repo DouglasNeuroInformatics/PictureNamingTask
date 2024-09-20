@@ -54,6 +54,8 @@ Adding stimuli
 
 Stimuli are added to the data.csv found in the ``dist/`` directory as follows:
 
+..table:: Grid table
+
 | Stimulus Image Path | Difficulty Level | Correct Response | Language |
 |----------------------|------------------|------------------|----------|
 | path/to/img_of_a_dog.jpg | 1 | A dog | en |
@@ -81,6 +83,8 @@ These settings are described below:
 - **seed** <number>: a seed for the psuedorandom number generator
 - **initialDifficulty** <number>: the difficulty that the task will start with
 - **numberOfLevels** <number>: the number of levels that are available for the task
+
+..table:: Grid table
 
 | Setting | Value |
 |---------|--------|

@@ -56,6 +56,8 @@ These settings are described below:
 - **numberOfLevels** <number>: the number of levels that are available for the task
 - **downloadOnFinish** <``true`` or ``false``>: If set to true will download a copy of the data as .csv file in addition to saving the data in ODC
 
+..table:: Grid table
+
 | Setting | Value |
 |---------|--------|
 | totalNumberOfTrialsToRun | 5 |

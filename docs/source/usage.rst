@@ -7,16 +7,27 @@ Serving locally
 ----------------
 
 To use PictureNamingTask locally a simple http server can be used. 
-Either download the dist from the GitHub or build the package from source e.g. ``npm build`` Then the index.html file can be served locally.
-Python3 offers a command to serve the index.html locally with one command. 
+There are 2 options available:
+
+- Go to the GitHub repository, download/clone project and build the from source e.g. ``npm build`` to obtain the ``dist`` directory which will contain ``index.html``
+- To obtain the already built files, the dist directory, navigate to the release on the GitHub page and download. ``index.html`` will be present in the ``dist`` directory
+
+
+The ``index.html`` file can be now be served locally.
+For example Python3 offers a command to serve the ``index.html`` locally with one command. 
 First ensure Python3 is installed. 
 `It can be found here <https://www.python.org/downloads/>`_.
 Choose the appropriate package for the OS that you have. 
-Using a terminal or powershell first navigate to the directory containing the index.html file then:
+Using a terminal or powershell first navigate to the directory containing the index.html file:
 
 .. code-block:: console
 
   $ cd path/to/directory/containing/index.html
+
+Then start the Python server:
+
+.. code-block:: console
+
   $ python -m http.server
 
 This will provide an output that looks something like this: 
@@ -41,7 +52,7 @@ More information about ``python http.server`` can be found here https://docs.pyt
 Adding stimuli
 ----------------
 
-Stimuli are added to the data.csv found in the ``dist/assets`` directory as follows:
+Stimuli are added to the data.csv found in the ``dist/`` directory as follows:
 
 .. csv-table:: data.csv 
    :header: "stimulus", "difficultyLevel", "correctResponse","language"
@@ -51,24 +62,30 @@ Stimuli are added to the data.csv found in the ``dist/assets`` directory as foll
    "path/to/img_of_a_dog.jpg",    "1",      "Un chien",       "fr"
    "path/to/img_of_a_cat.jpg",    "2",      "Un chat",        "fr"
 
+Currently there are nine directories with images corresponding to nine difficulty levels. 
+These are located in ``dist/level1 ... dist/level9`` if the ``dist`` was download. 
+In source code they are located in the ``public`` directory.
+
 .. _changing-experiment-settings:
 
 Changing experiment settings
 ----------------------------
 
-Experiment settings are changed in the experimentSettings.csv file which is located in the ``dist/assets`` directory.
+Experiment settings are changed in the ``experimentSettings.csv`` file which is located in the ``dist/`` directory.
 A template for this file can be found in the ``public`` directory: `public/experimentSettings  <https://github.com/DouglasNeuroInformatics/PictureNamingTask/blob/main/public/experimentSettings.csv>`_
 These settings are described below:
 
-- totalNumberOfTrialsToRun <number>: this is the number of images to be shown
-- advancementSchedule <number>: the number of correct answers that are required to increase the difficulty level by one
-- regressionSchedule <number>: the number of incorrect answers required to decrease the difficulty level by one
-- language <text>: the language of experiment, currently ``en`` or ``fr``
-- seed <number>: a seed for the psuedorandom number generator
-- initialDifficulty <number>: the difficulty that the task will start with
-- numberOfLevels <number>: the number of levels that are available for the task
+- **totalNumberOfTrialsToRun**  <number>: this is the number of images to be shown
+- **advancementSchedule** <number>: the number of correct answers that are required to increase the difficulty level by one
+- **regressionSchedule** <number>: the number of incorrect answers required to decrease the difficulty level by one
+- **language** <text>: the language of experiment, currently ``en`` or ``fr``
+- **seed** <number>: a seed for the psuedorandom number generator
+- **initialDifficulty** <number>: the difficulty that the task will start with
+- **numberOfLevels** <number>: the number of levels that are available for the task
 
-.. csv-table:: experimentSettings :rst:dir:`csv-table`
+.. csv-table:: experimentSettings.csv
    :header: totalNumberOfTrialsToRun, advancementSchedule, regressionSchedule, language, seed, initialDifficulty, numberOfLevels, downloadOnFinish
    5, 2, 0, en, 42, 1, 9, false
+
+
 

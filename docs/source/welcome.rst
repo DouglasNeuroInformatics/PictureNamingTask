@@ -24,6 +24,7 @@ how to :ref:`installation` the project.
 
 .. toctree::
   :caption: Contents
+  :maxdepth: 1
 
   usage
   usageODC

@@ -1,7 +1,7 @@
 Welcome to PictureNamingTask's documentation!
 ==============================================
 
-This is task is a modernized version of a classic neuropsychological task known as a "picture naming task", where an individual is presented with a set of pictures of sheet of paper and asked to name each of them (The "Boston Naming Test"[1] being the most frequently used).
+This is task is a modernized version of a classic neuropsychological task known as a "picture naming task", where an individual is presented with a set of pictures of sheet of paper and asked to name each of them (The "Boston Naming Test"[#f1]_ being the most frequently used).jhhk
 The classic task is "fixed" in terms of the number of images and which images are shown.
 Classically, the number correct and the answer provided are recorded as a measurement.
 This expands on the classic version by allowing a user to add and remove stimuli as they deem necessary.
@@ -30,4 +30,6 @@ how to :ref:`installation` the project.
   usageODC
   language
 
+.. rubric:: Footnotes
 
+.. [#f1] Kaplan, E., Goodglass, H., & Weintraub, S. (2001). Boston naming test. The Clinical Neuropsychologist. 

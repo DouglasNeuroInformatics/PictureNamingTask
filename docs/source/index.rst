@@ -33,3 +33,5 @@ how to :ref:`installation` the project.
 .. rubric:: Footnotes
 
 .. [#f1] Kaplan, E., Goodglass, H., & Weintraub, S. (2001). Boston naming test. The Clinical Neuropsychologist. 
+
+

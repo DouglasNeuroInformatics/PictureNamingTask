@@ -1,6 +1,11 @@
-import { $ExperimentResults } from "./schemas.ts";
+import { $ExperimentResults, $ParticipantIDTrial } from "./schemas.ts";
 
-import type { ExperimentResults, LoggingTrial } from "./schemas.ts";
+import type {
+  ExperimentResults,
+  ExperimentResultsUnion,
+  LoggingTrial,
+  ParticipantIDTrial,
+} from "./schemas.ts";
 import type { DataCollection } from "/runtime/v1/jspsych@8.x";
 
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
@@ -9,7 +14,17 @@ function dataMunger(data: DataCollection) {
   const trials = data
     .filter({ trial_type: "survey-html-form" })
     .values() as LoggingTrial[];
-  const experimentResults: ExperimentResults[] = [];
+  const idTrials = data
+    .filter({ trial_type: "survey-text" })
+    .values() as ParticipantIDTrial[];
+  const idTrial = idTrials[0]!;
+  const experimentResults: ExperimentResultsUnion[] = [];
+
+  const participantResult = $ParticipantIDTrial.parse({
+    trialType: idTrial.trialType,
+    response: idTrial.response,
+  });
+  experimentResults.push(participantResult);
   for (let trial of trials) {
     const result = $ExperimentResults.parse({
       stimulus: trial.stimulus,
@@ -26,7 +41,7 @@ function dataMunger(data: DataCollection) {
   return experimentResults;
 }
 
-function arrayToCSV(array: ExperimentResults[]) {
+function arrayToCSV(array: ExperimentResultsUnion[]) {
   const header = Object.keys(array[0]!).join(",");
   const trials = array
     .map((trial) => Object.values(trial).join(","))
@@ -58,21 +73,29 @@ function getLocalTime() {
   return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
 }
 
-function exportToJsonSerializable(data: ExperimentResults[]): {
+function exportToJsonSerializable(data: ExperimentResultsUnion[]): {
   [key: string]: unknown;
 } {
+  const participantTrial = data.find(
+    (result): result is ParticipantIDTrial =>
+      "response" in result && "Q0" in result.response,
+  )!;
+
   return {
     version: "1.0",
     timestamp: getLocalTime(),
-    experimentResults: data.map((result) => ({
-      stimulus: result.stimulus,
-      correctResponse: result.correctResponse,
-      difficultyLevel: result.difficultyLevel,
-      language: result.language,
-      rt: result.rt,
-      responseResult: result.responseResult,
-      responseNotes: result.responseNotes,
-    })),
+    participantId: participantTrial.response.Q0,
+    experimentResults: data
+      .filter((result): result is ExperimentResults => "stimulus" in result)
+      .map((result) => ({
+        stimulus: result.stimulus,
+        correctResponse: result.correctResponse,
+        difficultyLevel: result.difficultyLevel,
+        language: result.language,
+        rt: result.rt,
+        responseResult: result.responseResult,
+        responseNotes: result.responseNotes,
+      })),
   };
 }
 

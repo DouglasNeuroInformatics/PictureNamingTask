@@ -8,6 +8,10 @@ const i18n = createI18Next({
       en: "Welcome. Press any key to begin",
       fr: "Bienvenue. Appuyez sur n'importe quelle touche pour commencer",
     },
+    enterID: {
+      en: "Enter particpent ID",
+      fr: "Entrez l'ID de participant",
+    },
     correctResponse: {
       en: "Correct response:",
       fr: "La réponse correcte est:",

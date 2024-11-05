@@ -18,6 +18,7 @@ import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-key
 import { ImageKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x";
 import { PreloadPlugin } from "/runtime/v1/@jspsych/plugin-preload@2.x";
 import { SurveyHtmlFormPlugin } from "/runtime/v1/@jspsych/plugin-survey-html-form@2.x";
+import { SurveyTextPlugin } from "/runtime/v1/@jspsych/plugin-survey-text@2.x";
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
 import { initJsPsych } from "/runtime/v1/jspsych@8.x";
 import { JsPsych } from "/runtime/v1/jspsych@8.x";
@@ -172,6 +173,15 @@ experimentStimuli
       },
       stimulus: i18n.t("welcome"),
       type: HtmlKeyboardResponsePlugin,
+    };
+
+    const particpantIDPage = {
+      questions: [
+        {
+          prompt: i18n.t("enterID"),
+        },
+      ],
+      type: SurveyTextPlugin,
     };
 
     const preload = {

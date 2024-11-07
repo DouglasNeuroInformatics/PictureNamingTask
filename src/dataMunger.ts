@@ -17,14 +17,23 @@ function dataMunger(data: DataCollection) {
   const idTrials = data
     .filter({ trial_type: "survey-text" })
     .values() as ParticipantIDTrial[];
-  const idTrial = idTrials[0]!;
-  const experimentResults: ExperimentResultsUnion[] = [];
+  const idTrial = idTrials[0] ?? undefined;
+  console.log(idTrial);
+  let experimentResults: ExperimentResults[] | ExperimentResultsUnion[];
+  let participantResult: ParticipantIDTrial;
+  if (idTrial) {
+    experimentResults = [] as ExperimentResultsUnion[];
+    participantResult = $ParticipantIDTrial.parse({
+      trial_type: idTrial.trial_type,
+      response: idTrial.response,
+    });
+    experimentResults.push({
+      participantID: DOMPurify.sanitize(String(participantResult.response.Q0)),
+    });
+  } else {
+    experimentResults = [] as ExperimentResults[];
+  }
 
-  const participantResult = $ParticipantIDTrial.parse({
-    trialType: idTrial.trialType,
-    response: idTrial.response,
-  });
-  experimentResults.push(participantResult);
   for (let trial of trials) {
     const result = $ExperimentResults.parse({
       stimulus: trial.stimulus,
@@ -37,7 +46,7 @@ function dataMunger(data: DataCollection) {
     });
     experimentResults.push(result);
   }
-
+  console.table(experimentResults);
   return experimentResults;
 }
 

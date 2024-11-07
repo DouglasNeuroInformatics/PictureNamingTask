@@ -39,13 +39,14 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
   let numberOfTrialsRun = 1;
   let settingsParseResult;
   let imageDBParseResult;
-
+  let includeParticipantID = false;
   if (useJsonState.value) {
     settingsParseResult = $Settings.safeParse(experimentSettingsJson);
     imageDBParseResult = $ExperimentImage.array().safeParse(stimuliPaths);
   } else {
     settingsParseResult = $Settings.safeParse(experimentSettingsCSV);
     imageDBParseResult = $ExperimentImage.array().safeParse(imageDbCSV);
+    includeParticipantID = true;
   }
 
   if (!settingsParseResult.success) {
@@ -319,6 +320,10 @@ experimentStimuli
       },
       timeline,
     };
-    void jsPsych.run([welcome, loop_node]);
+    if (includeParticipantID) {
+      void jsPsych.run([welcome, particpantIDPage, loop_node]);
+    } else {
+      void jsPsych.run([welcome, loop_node]);
+    }
   })();
 }

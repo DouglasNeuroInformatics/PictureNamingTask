@@ -10,7 +10,8 @@ const $ParticipantResponse = z.object({
   result: z.string(),
 });
 const $Trial = z.object({
-  trialType: z.string(),
+  // snake_case due to jsPsych
+  trial_type: z.string(),
 });
 export const $ParticipantIDTrial = $Trial.extend({
   response: $ParticipantID,
@@ -24,14 +25,18 @@ const $LoggingTrial = $Trial.extend({
   stimulus: z.string(),
 });
 export const $ExperimentResults = $LoggingTrial
-  .omit({ response: true, trialType: true })
+  .omit({ response: true, trial_type: true })
   .extend({
     responseNotes: z.string(),
     responseResult: z.string(),
   });
+export const $ParticipantIDResult = z.object({
+  participantID: z.string(),
+});
+
 export const $ExperimentResultsUnion = z.union([
   $ExperimentResults,
-  $ParticipantIDTrial,
+  $ParticipantIDResult,
 ]);
 export const $Settings = z.object({
   advancementSchedule: z.coerce.number().positive().int(),

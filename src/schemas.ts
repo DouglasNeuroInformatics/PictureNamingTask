@@ -58,6 +58,7 @@ export const $ExperimentImage = z.object({
 
 export type ParticipantIDTrial = z.infer<typeof $ParticipantIDTrial>;
 export type SupportedLanguage = z.infer<typeof $Language>;
+export type ParticipantIDResult = z.infer<typeof $ParticipantIDResult>;
 export type ParticipantResponse = z.infer<typeof $ParticipantResponse>;
 export type Trial = z.infer<typeof $Trial>;
 export type LoggingTrial = z.infer<typeof $LoggingTrial>;

@@ -18,7 +18,6 @@ function dataMunger(data: DataCollection) {
     .filter({ trial_type: "survey-text" })
     .values() as ParticipantIDTrial[];
   const idTrial = idTrials[0] ?? undefined;
-  console.log(idTrial);
   let experimentResults: ExperimentResults[] | ExperimentResultsUnion[];
   let participantResult: ParticipantIDTrial;
   if (idTrial) {
@@ -46,7 +45,6 @@ function dataMunger(data: DataCollection) {
     });
     experimentResults.push(result);
   }
-  console.table(experimentResults);
   return experimentResults;
 }
 
@@ -82,18 +80,12 @@ function getLocalTime() {
   return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
 }
 
-function exportToJsonSerializable(data: ExperimentResultsUnion[]): {
+function exportToJsonSerializable(data: ExperimentResults[]): {
   [key: string]: unknown;
 } {
-  const participantTrial = data.find(
-    (result): result is ParticipantIDTrial =>
-      "response" in result && "Q0" in result.response,
-  )!;
-
   return {
     version: "1.0",
     timestamp: getLocalTime(),
-    participantId: participantTrial.response.Q0,
     experimentResults: data
       .filter((result): result is ExperimentResults => "stimulus" in result)
       .map((result) => ({
@@ -115,7 +107,7 @@ export function transformAndDownload(data: DataCollection) {
   downloadCSV(dataForCSV, `${currentDate}.csv`);
 }
 export function transformAndExportJson(data: DataCollection): any {
-  const mungedData = dataMunger(data);
+  const mungedData = dataMunger(data) as ExperimentResults[];
   const jsonSerializableData = exportToJsonSerializable(mungedData);
   return JSON.parse(JSON.stringify(jsonSerializableData));
 }

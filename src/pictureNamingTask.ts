@@ -16,6 +16,8 @@ import {
 } from "./schemas.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
 
+import './styles/instuctions.css'
+
 import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x";
 import { ImageKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x";
 import { PreloadPlugin } from "/runtime/v1/@jspsych/plugin-preload@2.x";
@@ -187,7 +189,37 @@ experimentStimuli
       ],
       type: SurveyTextPlugin,
     };
+    const instructions = {
+      stimulus: function() {
+        const html = `
+<div class="instructions-container">
+    <div class="instructions-content">
+        <h1>${i18n.t('task.title')}</h1>
+        
+        <div class="instructions-intro">
+            <p>${i18n.t('task.intro')}</p>
+        </div>
 
+        <ul class="instructions-steps">
+            <li class="instructions-step">${i18n.t('task.step1')}</li>
+            <li class="instructions-step">${i18n.t('task.step2')}</li>
+            <li class="instructions-step">${i18n.t('task.step3')}</li>
+            <li class="instructions-step">${i18n.t('task.step4')}</li>
+            <li class="instructions-step">${i18n.t('task.step5')}</li>
+            <li class="instructions-step">${i18n.t('task.step6')}</li>
+        </ul>
+
+        <div class="instructions-completion">
+            <p>${i18n.t('task.completion')}</p>
+        </div>
+    </div>
+</div>
+        `;
+        return html;
+      },
+      choices: [i18n.t("continue")],
+      type: htmlButtonResponse
+    };
     const preload = {
       auto_preload: true,
       message: `<p>loading stimulus</p>`,
@@ -333,9 +365,9 @@ experimentStimuli
       timeline,
     };
     if (includeParticipantID) {
-      void jsPsych.run([welcome, particpantIDPage, loop_node]);
+      void jsPsych.run([welcome, instructions, particpantIDPage, loop_node]);
     } else {
-      void jsPsych.run([welcome, loop_node]);
+      void jsPsych.run([welcome, instructions, loop_node]);
     }
   })();
 }

@@ -73,7 +73,7 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
 
   // small hack to get around i18n issues with wait for changeLanguage
   i18n.changeLanguage(language as Language);
-  await new Promise(function (resolve) {
+  await new Promise(function(resolve) {
     i18n.onLanguageChange = resolve;
   });
 
@@ -149,11 +149,11 @@ experimentStimuli
   // a trial is a single object eg htmlKeyboardResponse etc ...
   const timeline: any[] = [];
 
-  (function () {
+  (function() {
     let experimentStimuli = createStimuli(initialDifficulty, language, false);
     let currentDifficultyLevel = initialDifficulty;
     const jsPsych = initJsPsych({
-      on_finish: function () {
+      on_finish: function() {
         const data = jsPsych.data.get();
         if (downloadOnFinish) {
           transformAndDownload(data);
@@ -165,7 +165,7 @@ experimentStimuli
     });
 
     const welcome = {
-      on_start: function () {
+      on_start: function() {
         document.addEventListener(
           "click",
           () => simulateKeyPress(jsPsych, "a"),
@@ -193,7 +193,7 @@ experimentStimuli
     };
 
     const blankPage = {
-      on_start: function () {
+      on_start: function() {
         document.addEventListener(
           "click",
           () => simulateKeyPress(jsPsych, "a"),
@@ -204,7 +204,7 @@ experimentStimuli
       type: HtmlKeyboardResponsePlugin,
     };
     const showImg = {
-      on_start: function () {
+      on_start: function() {
         document.addEventListener(
           "click",
           () => simulateKeyPress(jsPsych, "a"),
@@ -225,36 +225,37 @@ experimentStimuli
         difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
         language: jsPsych.timelineVariable("language"),
       },
-      html: function () {
+      html: function() {
         const html = `
           <h3>${i18n.t("logResponse")}</h3>
           <input type="button" value="${i18n.t("correct")}" onclick="document.getElementById('result').value='${i18n.t("correct")}';">
           <input type="button" value="${i18n.t("incorrect")}" onclick="document.getElementById('result').value='${i18n.t("incorrect")}';">
           <br>
           <label for="result">${i18n.t("responseWas")}</label>
-          <input type="text" id="result" name="result" readonly>
+          <mark><output  id="result" name="result" ></output></mark>
           <hr>
-          <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
+          <h4>${i18n.t("logNotes")}</h4>
+          <textarea id="textBox" name="notes" placeholder="${i18n.t("logResponse")}"></textarea>
           <p>${i18n.t("logResponseToContinue")}</p>`;
         return html;
       },
-      on_load: function () {
+      on_load: function() {
         const submitButton = document.getElementById(
           "jspsych-survey-html-form-next",
         ) as HTMLButtonElement;
-        const resultInput = document.getElementById(
+        const resultOutput = document.getElementById(
           "result",
-        ) as HTMLInputElement;
+        ) as HTMLOutputElement;
         submitButton.disabled = true;
         document.querySelectorAll('input[type="button"]').forEach((button) => {
           button.addEventListener("click", () => {
-            if (resultInput.value !== "") {
+            if (resultOutput.value) {
               submitButton.disabled = false;
             }
           });
         });
       },
-      preamble: function () {
+      preamble: function() {
         const html = `<h3>${i18n.t("correctResponse")}</h3>
                     <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>
                     <img src="${jsPsych.evaluateTimelineVariable("stimulus")}" width="300" height="300">`;
@@ -264,7 +265,7 @@ experimentStimuli
     };
     const testProcedure = {
       // to reload the experimentStimuli after one repetition has been completed
-      on_timeline_start: function () {
+      on_timeline_start: function() {
         this.timeline_variables = experimentStimuli;
       },
       timeline: [preload, blankPage, showImg, blankPage, logging],
@@ -273,7 +274,7 @@ experimentStimuli
     timeline.push(testProcedure);
 
     const loop_node = {
-      loop_function: function () {
+      loop_function: function() {
         // tracking number of corret answers
         // need to access logging trial info
         let clearSet = false;

@@ -1,3 +1,5 @@
+// needs to be updated to version 2
+import htmlButtonResponse from '@jspsych/plugin-html-button-response'
 import type { Language } from "@opendatacapture/runtime-v1/@opendatacapture/runtime-core/index.js";
 
 import { transformAndDownload, transformAndExportJson } from "./dataMunger.ts";
@@ -166,11 +168,12 @@ experimentStimuli
 
     const welcome = {
       on_start: function() {
-        document.addEventListener(
-          "click",
-          () => simulateKeyPress(jsPsych, "a"),
-          { once: true },
-        );
+        const handleClick = () => simulateKeyPress(jsPsych, "a");
+        document.addEventListener("click", handleClick, { once: true })
+      },
+      on_finish: function() {
+        const handleClick = () => simulateKeyPress(jsPsych, "a");
+        document.removeEventListener("click", handleClick)
       },
       stimulus: i18n.t("welcome"),
       type: HtmlKeyboardResponsePlugin,
@@ -191,25 +194,32 @@ experimentStimuli
       show_progress_bar: true,
       type: PreloadPlugin,
     };
+    const pageBeforeImage = {
+      stimulus: i18n.t("continueToShowImage"),
+      choices: [i18n.t("continue")],
+      type: htmlButtonResponse,
+    };
+    const pageAfterImage = {
+      stimulus: i18n.t("passToTA"),
+      choices: [i18n.t("continue")],
+      type: htmlButtonResponse,
+    };
 
     const blankPage = {
-      on_start: function() {
-        document.addEventListener(
-          "click",
-          () => simulateKeyPress(jsPsych, "a"),
-          { once: true },
-        );
-      },
       stimulus: "",
+      choices: 'NO_KEYS',
+      trial_duration: 500,
       type: HtmlKeyboardResponsePlugin,
     };
     const showImg = {
+
       on_start: function() {
-        document.addEventListener(
-          "click",
-          () => simulateKeyPress(jsPsych, "a"),
-          { once: true },
-        );
+        const handleClick = () => simulateKeyPress(jsPsych, "a");
+        document.addEventListener("click", handleClick, { once: true })
+      },
+      on_finish: function() {
+        const handleClick = () => simulateKeyPress(jsPsych, "a");
+        document.removeEventListener("click", handleClick)
       },
       stimulus: jsPsych.timelineVariable("stimulus"),
       stimulus_height: 600,
@@ -268,7 +278,8 @@ experimentStimuli
       on_timeline_start: function() {
         this.timeline_variables = experimentStimuli;
       },
-      timeline: [preload, blankPage, showImg, blankPage, logging],
+      //timeline: [preload, pageBeforeImage, showImg, pageAfterImage, logging],
+      timeline: [preload, pageBeforeImage, blankPage, showImg, pageAfterImage, logging],
       timeline_variables: experimentStimuli,
     };
     timeline.push(testProcedure);

@@ -12,6 +12,18 @@ const i18n = createI18Next({
       en: "Enter particpent ID",
       fr: "Entrez l'ID de participant",
     },
+    continueToShowImage: {
+      en: "Press button to show image. Image will display after 500 ms",
+      fr: "Appuyez sur le bouton pour afficher l'image. L'image s'affichera après 500 ms",
+    },
+    continue: {
+      en: "continue",
+      fr: "continuer"
+    },
+    passToTA: {
+      en: "Return to the task administrator",
+      fr: "Renvoyer à l'administrateur de la tâche",
+    },
     correctResponse: {
       en: "Correct response:",
       fr: "La réponse correcte est:",
@@ -51,7 +63,7 @@ const i18n = createI18Next({
   },
 });
 // the whole i18n implementation needs to be changed
-document.addEventListener("changeLanguage", function (event) {
+document.addEventListener("changeLanguage", function(event) {
   // @ts-expect-error the event does have a detail
   document.documentElement.setAttribute("lang", event.detail as string);
 });

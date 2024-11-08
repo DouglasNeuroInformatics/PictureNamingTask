@@ -1,4 +1,4 @@
-// needs to be updated to version 2
+// needs to be updated to version 2 in ODC runtime
 import htmlButtonResponse from '@jspsych/plugin-html-button-response'
 import type { Language } from "@opendatacapture/runtime-v1/@opendatacapture/runtime-core/index.js";
 
@@ -187,33 +187,34 @@ experimentStimuli
           prompt: i18n.t("enterID"),
         },
       ],
+      button_label: i18n.t('continue'),
       type: SurveyTextPlugin,
     };
     const instructions = {
       stimulus: function() {
         const html = `
-<div class="instructions-container">
-    <div class="instructions-content">
-        <h1>${i18n.t('task.title')}</h1>
+          <div class="instructions-container">
+           <div class="instructions-content">
+            <h1>${i18n.t('task.title')}</h1>
         
-        <div class="instructions-intro">
-            <p>${i18n.t('task.intro')}</p>
-        </div>
+             <div class="instructions-intro">
+              <p>${i18n.t('task.intro')}</p>
+             </div>
 
-        <ul class="instructions-steps">
-            <li class="instructions-step">${i18n.t('task.step1')}</li>
-            <li class="instructions-step">${i18n.t('task.step2')}</li>
-            <li class="instructions-step">${i18n.t('task.step3')}</li>
-            <li class="instructions-step">${i18n.t('task.step4')}</li>
-            <li class="instructions-step">${i18n.t('task.step5')}</li>
-            <li class="instructions-step">${i18n.t('task.step6')}</li>
-        </ul>
+            <ul class="instructions-steps">
+              <li class="instructions-step">${i18n.t('task.step1')}</li>
+              <li class="instructions-step">${i18n.t('task.step2')}</li>
+              <li class="instructions-step">${i18n.t('task.step3')}</li>
+              <li class="instructions-step">${i18n.t('task.step4')}</li>
+              <li class="instructions-step">${i18n.t('task.step5')}</li>
+              <li class="instructions-step">${i18n.t('task.step6')}</li>
+            </ul>
 
-        <div class="instructions-completion">
-            <p>${i18n.t('task.completion')}</p>
+            <div class="instructions-completion">
+              <p>${i18n.t('task.completion')}</p>
+            </div>
+          </div>
         </div>
-    </div>
-</div>
         `;
         return html;
       },

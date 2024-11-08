@@ -55,8 +55,8 @@ const i18n = createI18Next({
       fr: "Appuyez sur le bouton pour afficher l'image. L'image s'affichera après 500 ms",
     },
     continue: {
-      en: "continue",
-      fr: "continuer"
+      en: "Continue",
+      fr: "Continuer"
     },
     passToTA: {
       en: "Return to the task administrator",

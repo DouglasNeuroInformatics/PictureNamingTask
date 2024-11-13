@@ -26,7 +26,7 @@ import { SurveyTextPlugin } from "/runtime/v1/@jspsych/plugin-survey-text@2.x";
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
 import { initJsPsych } from "/runtime/v1/jspsych@8.x";
 import { JsPsych } from "/runtime/v1/jspsych@8.x";
-import {
+import PureRand, {
   uniformIntDistribution,
   xoroshiro128plus,
 } from "/runtime/v1/pure-rand@6.x";
@@ -38,7 +38,6 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
   // variables for controlling advancementSchedule, regressionSchedule, and when the experiment is finished
   //
   // can be read from either the csv files in public/ or via json if using the instrument playground
-
   let numberOfCorrectAnswers = 0;
   let numberOfTrialsRun = 1;
   let settingsParseResult;
@@ -70,7 +69,7 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
     regressionSchedule,
     language,
     numberOfLevels,
-    seed,
+    optionalSeed,
     downloadOnFinish,
     initialDifficulty,
   } = settingsParseResult.data;
@@ -87,7 +86,14 @@ experimentStimuli
 */
 
   const indiciesSelected = new Set();
-  let rng = xoroshiro128plus(seed);
+  let rng: PureRand.RandomGenerator
+  if (optionalSeed) {
+    rng = xoroshiro128plus(optionalSeed);
+  }
+  else {
+    const seed = Date.now() ^ (Math.random() * 0x100000000);
+    rng = xoroshiro128plus(seed)
+  }
 
   // closure
   function getRandomElementWithSeed(
@@ -160,10 +166,10 @@ experimentStimuli
       on_finish: function() {
         const data = jsPsych.data.get();
         if (downloadOnFinish) {
-          transformAndDownload(data);
+          transformAndDownload(data, settingsParseResult);
         }
         if (onFinish) {
-          onFinish(transformAndExportJson(data));
+          onFinish(transformAndExportJson(data, settingsParseResult));
         }
       },
     });
@@ -269,10 +275,21 @@ experimentStimuli
         language: jsPsych.timelineVariable("language"),
       },
       html: function() {
+        const valueIfCorrect = 1
+        const valueIfIncorrect = 0
         const html = `
+          <input type="hidden" id="resultAsNumber" name="resultAsNumber" value=''>
           <h3>${i18n.t("logResponse")}</h3>
-          <input type="button" value="${i18n.t("correct")}" onclick="document.getElementById('result').value='${i18n.t("correct")}';">
-          <input type="button" value="${i18n.t("incorrect")}" onclick="document.getElementById('result').value='${i18n.t("incorrect")}';">
+          <input type="button" value="${i18n.t("correct")}" 
+           onclick="
+             document.getElementById('result').value='${i18n.t("correct")}';
+             document.getElementById('resultAsNumber').value='${valueIfCorrect}';
+           ">
+          <input type="button" value="${i18n.t("incorrect")}" 
+           onclick="
+             document.getElementById('result').value='${i18n.t("incorrect")}';
+             document.getElementById('resultAsNumber').value='${valueIfIncorrect}';
+           ">
           <br>
           <label for="result">${i18n.t("responseWas")}</label>
           <mark><output  id="result" name="result" ></output></mark>
@@ -311,7 +328,6 @@ experimentStimuli
       on_timeline_start: function() {
         this.timeline_variables = experimentStimuli;
       },
-      //timeline: [preload, pageBeforeImage, showImg, pageAfterImage, logging],
       timeline: [preload, pageBeforeImage, blankPage, showImg, pageAfterImage, logging],
       timeline_variables: experimentStimuli,
     };
@@ -332,10 +348,8 @@ experimentStimuli
           .filter({ trial_type: "survey-html-form" })
           .values() as LoggingTrial[];
         const lastTrialIndex = loggingResponseArray.length - 1;
-
         const lastTrialResults: ParticipantResponse =
           loggingResponseArray[lastTrialIndex]!.response;
-
         if (lastTrialResults.result === "Correct") {
           numberOfCorrectAnswers++;
           clearSet = false;

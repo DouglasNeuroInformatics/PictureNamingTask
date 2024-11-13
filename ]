@@ -8,7 +8,7 @@ const $ParticipantID = z.object({
 const $ParticipantResponse = z.object({
   notes: z.string(),
   result: z.string(),
-  resultAsNumber: z.string()
+  resultAsNumber: z.coerce.number().int(),
 });
 const $Trial = z.object({
   // snake_case due to jsPsych
@@ -30,18 +30,14 @@ export const $ExperimentResults = $LoggingTrial
   .extend({
     responseNotes: z.string(),
     responseResult: z.string(),
-    responseResultAsNumber: z.string(),
   });
 export const $ParticipantIDResult = z.object({
   participantID: z.string(),
 });
-export const $ExperimentSeed = z.object({
-  experimentSeed: z.coerce.number()
-})
+
 export const $ExperimentResultsUnion = z.union([
   $ExperimentResults,
   $ParticipantIDResult,
-  $ExperimentSeed,
 ]);
 export const $Settings = z.object({
   advancementSchedule: z.coerce.number().positive().int(),
@@ -50,7 +46,7 @@ export const $Settings = z.object({
   language: z.string(),
   numberOfLevels: z.coerce.number().positive().int(),
   regressionSchedule: z.coerce.number().int(),
-  optionalSeed: z.coerce.number().positive().int().optional(),
+  seed: z.coerce.number().positive().int(),
   totalNumberOfTrialsToRun: z.coerce.number().positive().int(),
 });
 

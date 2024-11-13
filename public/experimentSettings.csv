@@ -1,2 +1,2 @@
 totalNumberOfTrialsToRun,advancementSchedule,regressionSchedule,language,seed,initialDifficulty,numberOfLevels,downloadOnFinish
-1,2,0,fr,42,1,9,true
+1,2,0,fr,undefined,5,9,true

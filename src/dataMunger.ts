@@ -1,16 +1,17 @@
-import { $ExperimentResults, $ParticipantIDTrial } from "./schemas.ts";
+import { $ExperimentResults, $ParticipantIDTrial, $Settings } from "./schemas.ts";
 
 import type {
   ExperimentResults,
   ExperimentResultsUnion,
   LoggingTrial,
   ParticipantIDTrial,
+  Settings,
 } from "./schemas.ts";
 import type { DataCollection } from "/runtime/v1/jspsych@8.x";
 
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
 
-function dataMunger(data: DataCollection) {
+function dataMunger(data: DataCollection, settings: Settings) {
   const trials = data
     .filter({ trial_type: "survey-html-form" })
     .values() as LoggingTrial[];
@@ -42,10 +43,14 @@ function dataMunger(data: DataCollection) {
       rt: trial.rt,
       responseResult: trial.response.result,
       responseNotes: DOMPurify.sanitize(trial.response.notes),
+      responseResultAsNumber: trial.response.resultAsNumber,
     });
     experimentResults.push(result);
   }
-  return experimentResults;
+  return {
+    experimentResults,
+    settings: settings
+  };
 }
 
 function arrayToCSV(array: ExperimentResultsUnion[]) {
@@ -96,18 +101,19 @@ function exportToJsonSerializable(data: ExperimentResults[]): {
         rt: result.rt,
         responseResult: result.responseResult,
         responseNotes: result.responseNotes,
+        responseResultAsNumber: result.responseResultAsNumber,
       })),
   };
 }
 
-export function transformAndDownload(data: DataCollection) {
-  const mungedData = dataMunger(data);
+export function transformAndDownload(data: DataCollection, settings: Settings) {
+  const mungedData = dataMunger(data, settings);
   const dataForCSV = arrayToCSV(mungedData);
   const currentDate = getLocalTime();
   downloadCSV(dataForCSV, `${currentDate}.csv`);
 }
-export function transformAndExportJson(data: DataCollection): any {
-  const mungedData = dataMunger(data) as ExperimentResults[];
+export function transformAndExportJson(data: DataCollection, settings): any {
+  const mungedData = dataMunger(data, settings) as ExperimentResults[];
   const jsonSerializableData = exportToJsonSerializable(mungedData);
   return JSON.parse(JSON.stringify(jsonSerializableData));
 }

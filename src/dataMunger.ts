@@ -2,16 +2,15 @@ import { $ExperimentResults, $ParticipantIDTrial, $Settings } from "./schemas.ts
 
 import type {
   ExperimentResults,
-  ExperimentResultsUnion,
   LoggingTrial,
+  ParticipantIDResult,
   ParticipantIDTrial,
-  Settings,
 } from "./schemas.ts";
 import type { DataCollection } from "/runtime/v1/jspsych@8.x";
 
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
 
-function dataMunger(data: DataCollection, settings: Settings) {
+function dataMunger(data: DataCollection): (ExperimentResults | ParticipantIDResult)[] {
   const trials = data
     .filter({ trial_type: "survey-html-form" })
     .values() as LoggingTrial[];
@@ -19,23 +18,20 @@ function dataMunger(data: DataCollection, settings: Settings) {
     .filter({ trial_type: "survey-text" })
     .values() as ParticipantIDTrial[];
   const idTrial = idTrials[0] ?? undefined;
-  let experimentResults: ExperimentResults[] | ExperimentResultsUnion[];
-  let participantResult: ParticipantIDTrial;
+
+  const results: (ExperimentResults | ParticipantIDResult)[] = [];
+
   if (idTrial) {
-    experimentResults = [] as ExperimentResultsUnion[];
-    participantResult = $ParticipantIDTrial.parse({
+    const participantResult = $ParticipantIDTrial.parse({
       trial_type: idTrial.trial_type,
       response: idTrial.response,
     });
-    experimentResults.push({
+    results.push({
       participantID: DOMPurify.sanitize(String(participantResult.response.Q0)),
     });
-  } else {
-    experimentResults = [] as ExperimentResults[];
   }
-
-  for (let trial of trials) {
-    const result = $ExperimentResults.parse({
+  const trialResults = trials.map(trial => {
+    return $ExperimentResults.parse({
       stimulus: trial.stimulus,
       correctResponse: trial.correctResponse,
       difficultyLevel: trial.difficultyLevel,
@@ -45,20 +41,39 @@ function dataMunger(data: DataCollection, settings: Settings) {
       responseNotes: DOMPurify.sanitize(trial.response.notes),
       responseResultAsNumber: trial.response.resultAsNumber,
     });
-    experimentResults.push(result);
-  }
-  return {
-    experimentResults,
-    settings: settings
-  };
+  });
+
+  results.push(...trialResults);
+
+  return results;
 }
 
-function arrayToCSV(array: ExperimentResultsUnion[]) {
-  const header = Object.keys(array[0]!).join(",");
-  const trials = array
-    .map((trial) => Object.values(trial).join(","))
-    .join("\n");
-  return `${header}\n${trials}`;
+function arrayToCSV(array: (ExperimentResults | ParticipantIDResult)[]): string {
+
+  let csvContent = '';
+  // check for ID, need to fix error here. .participantID does exsits on this 
+  if (array[0].participantID!) {
+    csvContent += 'participantID\n';
+    csvContent += array[0].participantID + '\n';
+  }
+  // headers
+  csvContent += Object.keys(array[array.length - 1]!).join(',') + '\n';
+  // append results to csv
+  for (let item of array) {
+    if ('stimulus' in item) {
+      const results = Object.values(item).map(result => {
+        // incase notes contain commas
+        if (typeof result === 'string' && result.includes((','))) {
+          return `"${result}"`
+        }
+        return result
+      })
+      const row = results.join(',')
+      csvContent += row + '\n'
+    }
+  }
+
+  return csvContent;
 }
 
 function downloadCSV(dataForCSV: string, filename: string) {
@@ -106,14 +121,14 @@ function exportToJsonSerializable(data: ExperimentResults[]): {
   };
 }
 
-export function transformAndDownload(data: DataCollection, settings: Settings) {
-  const mungedData = dataMunger(data, settings);
+export function transformAndDownload(data: DataCollection) {
+  const mungedData = dataMunger(data) as ExperimentResults[];
   const dataForCSV = arrayToCSV(mungedData);
   const currentDate = getLocalTime();
   downloadCSV(dataForCSV, `${currentDate}.csv`);
 }
-export function transformAndExportJson(data: DataCollection, settings): any {
-  const mungedData = dataMunger(data, settings) as ExperimentResults[];
+export function transformAndExportJson(data: DataCollection): any {
+  const mungedData = dataMunger(data) as ExperimentResults[];
   const jsonSerializableData = exportToJsonSerializable(mungedData);
   return JSON.parse(JSON.stringify(jsonSerializableData));
 }

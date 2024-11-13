@@ -35,13 +35,9 @@ export const $ExperimentResults = $LoggingTrial
 export const $ParticipantIDResult = z.object({
   participantID: z.string(),
 });
-export const $ExperimentSeed = z.object({
-  experimentSeed: z.coerce.number()
-})
 export const $ExperimentResultsUnion = z.union([
   $ExperimentResults,
   $ParticipantIDResult,
-  $ExperimentSeed,
 ]);
 export const $Settings = z.object({
   advancementSchedule: z.coerce.number().positive().int(),

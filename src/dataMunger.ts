@@ -5,6 +5,7 @@ import type {
   LoggingTrial,
   ParticipantIDResult,
   ParticipantIDTrial,
+  Settings,
 } from "./schemas.ts";
 import type { DataCollection } from "/runtime/v1/jspsych@8.x";
 
@@ -75,7 +76,45 @@ function arrayToCSV(array: (ExperimentResults | ParticipantIDResult)[]): string 
 
   return csvContent;
 }
+function settingsDataMunger(settings: Settings) {
 
+  return $Settings.parse({
+    advancementSchedule: settings.advancementSchedule,
+    downloadOnFinish: settings.downloadOnFinish,
+    initialDifficulty: settings.initialDifficulty,
+    language: settings.language,
+    numberOfLevels: settings.numberOfLevels,
+    regressionSchedule: settings.regressionSchedule,
+    optionalSeed: settings.optionalSeed,
+    totalNumberOfTrialsToRun: settings.totalNumberOfTrialsToRun,
+  });
+
+}
+
+function settingsToCSV(settings: Settings): string {
+
+  const headers = Object.keys(settings[0]).join(',');
+  let csvContent = headers + '\n';
+
+  for (const setting of settings) {
+    const row = Object.values(setting).map(value => {
+      if (value === undefined) {
+        return '';
+      }
+      if (typeof value === 'boolean') {
+        return value.toString();
+      }
+      // Handle string values that might contain commas
+      if (typeof value === 'string' && value.includes(',')) {
+        return `"${value}"`;
+      }
+      return value;
+    }).join(',');
+
+    csvContent += row + '\n';
+  }
+  return csvContent;
+}
 function downloadCSV(dataForCSV: string, filename: string) {
   const blob = new Blob([dataForCSV], { type: "text/csv;charset=utf8" });
   const url = URL.createObjectURL(blob);
@@ -121,11 +160,14 @@ function exportToJsonSerializable(data: ExperimentResults[]): {
   };
 }
 
-export function transformAndDownload(data: DataCollection) {
+export function transformAndDownload(data: DataCollection, settings: Settings) {
   const mungedData = dataMunger(data) as ExperimentResults[];
+  const mungedSettings = settingsDataMunger(settings);
   const dataForCSV = arrayToCSV(mungedData);
+  const settingsDataForCsv = settingsToCSV(mungedSettings)
   const currentDate = getLocalTime();
   downloadCSV(dataForCSV, `${currentDate}.csv`);
+  downloadCSV(settingsDataForCsv, `${currentDate}Settings.csv`)
 }
 export function transformAndExportJson(data: DataCollection): any {
   const mungedData = dataMunger(data) as ExperimentResults[];

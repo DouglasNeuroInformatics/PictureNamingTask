@@ -46,7 +46,10 @@ export const $Settings = z.object({
   language: z.string(),
   numberOfLevels: z.coerce.number().positive().int(),
   regressionSchedule: z.coerce.number().int(),
-  optionalSeed: z.coerce.number().positive().int().optional(),
+  seed: z.preprocess(
+    (val) => val === '' || val === null || val === 0 || val === undefined ? undefined : val,
+    z.coerce.number().positive().int().optional()
+  ),
   totalNumberOfTrialsToRun: z.coerce.number().positive().int(),
 });
 

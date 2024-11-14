@@ -13,6 +13,7 @@ import {
   type ExperimentImage,
   type LoggingTrial,
   type ParticipantResponse,
+  type Settings,
 } from "./schemas.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
 
@@ -69,10 +70,13 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
     regressionSchedule,
     language,
     numberOfLevels,
-    optionalSeed,
     downloadOnFinish,
     initialDifficulty,
   } = settingsParseResult.data;
+  let seed: number | undefined;
+  if (typeof settingsParseResult.data.seed === 'number') {
+    seed = settingsParseResult.data.seed as number
+  }
 
   // small hack to get around i18n issues with wait for changeLanguage
   i18n.changeLanguage(language as Language);
@@ -87,11 +91,11 @@ experimentStimuli
 
   const indiciesSelected = new Set();
   let rng: PureRand.RandomGenerator
-  if (optionalSeed) {
-    rng = xoroshiro128plus(optionalSeed);
+  if (seed) {
+    rng = xoroshiro128plus(seed);
   }
   else {
-    const seed = Date.now() ^ (Math.random() * 0x100000000);
+    seed = Date.now() ^ (Math.random() * 0x100000000)
     rng = xoroshiro128plus(seed)
   }
 
@@ -166,7 +170,18 @@ experimentStimuli
       on_finish: function() {
         const data = jsPsych.data.get();
         if (downloadOnFinish) {
-          transformAndDownload(data, settingsParseResult);
+          const settings: Settings = {
+            totalNumberOfTrialsToRun,
+            advancementSchedule,
+            regressionSchedule,
+            language,
+            numberOfLevels,
+            downloadOnFinish,
+            initialDifficulty,
+            seed,
+          };
+          console.table(settings)
+          transformAndDownload(data, settings);
         }
         if (onFinish) {
           onFinish(transformAndExportJson(data, settingsParseResult));

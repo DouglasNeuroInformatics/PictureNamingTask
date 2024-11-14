@@ -3,7 +3,7 @@ const experimentSettingsJson = {
   "advancementSchedule": 2,
   "regressionSchedule": 0,
   "language": "fr",
-  "optionalSeed": undefined,
+  "seed": undefined,
   "initialDifficulty": 5,
   "numberOfLevels": 9,
   "downloadOnFinish": false,

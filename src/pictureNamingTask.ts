@@ -39,6 +39,7 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
   // variables for controlling advancementSchedule, regressionSchedule, and when the experiment is finished
   //
   // can be read from either the csv files in public/ or via json if using the instrument playground
+  let shouldRepeatTrial = false;
   let numberOfCorrectAnswers = 0;
   let numberOfTrialsRun = 1;
   let settingsParseResult;
@@ -75,7 +76,7 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
   } = settingsParseResult.data;
   let seed: number | undefined;
   if (typeof settingsParseResult.data.seed === 'number') {
-    seed = settingsParseResult.data.seed as number
+    seed = settingsParseResult.data.seed
   }
 
   // small hack to get around i18n issues with wait for changeLanguage
@@ -180,7 +181,6 @@ experimentStimuli
             initialDifficulty,
             seed,
           };
-          console.table(settings)
           transformAndDownload(data, settings);
         }
         if (onFinish) {
@@ -229,6 +229,7 @@ experimentStimuli
               <li class="instructions-step">${i18n.t('task.step4')}</li>
               <li class="instructions-step">${i18n.t('task.step5')}</li>
               <li class="instructions-step">${i18n.t('task.step6')}</li>
+              <li class="instructions-step">${i18n.t('task.step7')}</li>
             </ul>
 
             <div class="instructions-completion">
@@ -283,11 +284,20 @@ experimentStimuli
     const logging = {
       autofocus: "textBox",
       button_label: i18n.t("submit"),
-      data: {
-        stimulus: jsPsych.timelineVariable("stimulus"),
-        correctResponse: jsPsych.timelineVariable("correctResponse"),
-        difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
-        language: jsPsych.timelineVariable("language"),
+      data: function() {
+        const rt = jsPsych.data.get()
+          .filter({ trial_type: 'image-keyboard-response' })
+          .last()
+          .select('rt')
+          .values[0] as string;
+
+        return {
+          stimulus: jsPsych.timelineVariable("stimulus"),
+          correctResponse: jsPsych.timelineVariable("correctResponse"),
+          difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
+          language: jsPsych.timelineVariable("language"),
+          participantResponseTime: rt
+        };
       },
       html: function() {
         const valueIfCorrect = 1
@@ -315,6 +325,17 @@ experimentStimuli
         return html;
       },
       on_load: function() {
+        if (shouldRepeatTrial) {
+          const trialData = {
+            rt: 1,
+            response: {
+              notes: 'Trial repeated',
+              result: 'Incorrect',
+              resultAsNumber: '0',
+            }
+          }
+          jsPsych.finishTrial(trialData);
+        }
         const submitButton = document.getElementById(
           "jspsych-survey-html-form-next",
         ) as HTMLButtonElement;
@@ -338,25 +359,55 @@ experimentStimuli
       },
       type: SurveyHtmlFormPlugin,
     };
+
+    const repeatButtonTrial = {
+      type: htmlButtonResponse,
+      stimulus: i18n.t('repeat'),
+      choices: [i18n.t('yes'), i18n.t('no')],
+      on_finish: function(data) {
+        if (data.response === 0) {
+          shouldRepeatTrial = true
+        }
+        else {
+          shouldRepeatTrial = false
+        }
+      }
+    };
+
     const testProcedure = {
-      // to reload the experimentStimuli after one repetition has been completed
       on_timeline_start: function() {
-        this.timeline_variables = experimentStimuli;
+        // If not repeating, load new stimuli
+        // If repeating, keep the current timeline_variables
+        if (!shouldRepeatTrial) {
+          this.timeline_variables = experimentStimuli;
+        }
       },
-      timeline: [preload, pageBeforeImage, blankPage, showImg, pageAfterImage, logging],
+      timeline: [
+        preload,
+        pageBeforeImage,
+        blankPage,
+        showImg,
+        pageAfterImage,
+        repeatButtonTrial,
+        logging
+      ],
       timeline_variables: experimentStimuli,
     };
+
     timeline.push(testProcedure);
 
     const loop_node = {
       loop_function: function() {
-        // tracking number of corret answers
-        // need to access logging trial info
-        let clearSet = false;
 
+        if (shouldRepeatTrial) {
+          return true;
+        }
+
+        let clearSet = false;
         if (numberOfTrialsRun === totalNumberOfTrialsToRun) {
           return false;
         }
+
         // getting the most recent logged result
         const loggingResponseArray = jsPsych.data
           .get()
@@ -365,17 +416,18 @@ experimentStimuli
         const lastTrialIndex = loggingResponseArray.length - 1;
         const lastTrialResults: ParticipantResponse =
           loggingResponseArray[lastTrialIndex]!.response;
+
         if (lastTrialResults.result === "Correct") {
           numberOfCorrectAnswers++;
           clearSet = false;
         } else if (lastTrialResults.result === "Incorrect") {
           numberOfCorrectAnswers = 0;
         }
-        // difficulty level logic, <x> correct answers in a row, increase, <y> incorrect answer decrease
+
+        // difficulty level logic
         if (numberOfCorrectAnswers === advancementSchedule) {
           if (numberOfCorrectAnswers <= numberOfLevels) {
             currentDifficultyLevel++;
-            // need to reset as difficulty has changed
             numberOfCorrectAnswers = 0;
             clearSet = true;
           }
@@ -384,16 +436,19 @@ experimentStimuli
             currentDifficultyLevel--;
           }
         }
+
         experimentStimuli = createStimuli(
           currentDifficultyLevel,
           language,
           clearSet,
         );
+
         numberOfTrialsRun++;
         return true;
       },
       timeline,
     };
+
     if (includeParticipantID) {
       void jsPsych.run([welcome, instructions, particpantIDPage, loop_node]);
     } else {

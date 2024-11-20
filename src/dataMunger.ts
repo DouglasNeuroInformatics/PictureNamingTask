@@ -37,7 +37,7 @@ function dataMunger(data: DataCollection): (ExperimentResults | ParticipantIDRes
       correctResponse: trial.correctResponse,
       difficultyLevel: trial.difficultyLevel,
       language: trial.language,
-      rt: trial.rt,
+      participantResponseTime: trial.participantResponseTime,
       responseResult: trial.response.result,
       responseNotes: DOMPurify.sanitize(trial.response.notes),
       responseResultAsNumber: trial.response.resultAsNumber,

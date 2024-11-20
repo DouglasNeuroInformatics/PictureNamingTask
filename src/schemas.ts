@@ -8,7 +8,7 @@ const $ParticipantID = z.object({
 const $ParticipantResponse = z.object({
   notes: z.string(),
   result: z.string(),
-  resultAsNumber: z.string()
+  resultAsNumber: z.string(),
 });
 const $Trial = z.object({
   // snake_case due to jsPsych
@@ -22,7 +22,7 @@ const $LoggingTrial = $Trial.extend({
   difficultyLevel: z.coerce.number().positive().int(),
   language: $Language,
   response: $ParticipantResponse,
-  rt: z.coerce.number().positive().int(),
+  participantResponseTime: z.coerce.number().positive().int(),
   stimulus: z.string(),
 });
 export const $ExperimentResults = $LoggingTrial

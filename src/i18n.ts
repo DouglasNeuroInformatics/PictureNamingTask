@@ -38,10 +38,14 @@ const i18n = createI18Next({
         fr: "Un nouvel écran s'affichera demandant que la machine soit rendue à l'administrateur de la tâche"
       },
       step5: {
+        en: "If the image was skipped by accident it can be repeated via this screen.",
+        fr: "Si l'image a été ignorée par accident, elle peut être répétée via cet écran."
+      },
+      step6: {
         en: "The next screen will be for logging the response and any extra notes that are to be recorded",
         fr: "L'écran suivant servira à enregistrer la réponse et toutes les notes supplémentaires à consigner"
       },
-      step6: {
+      step7: {
         en: "After the results have been recorded a new page will be displayed and the steps are repeated",
         fr: "Après l'enregistrement des résultats, une nouvelle page s'affichera et les étapes seront répétées"
       },
@@ -49,6 +53,18 @@ const i18n = createI18Next({
         en: "Once all images have been displayed and all results have been recorded the data will be sent to Open Data Capture (if being used) and/or downloaded as .csv if parameters of the experiment have been set as such",
         fr: "Une fois que toutes les images ont été affichées et que tous les résultats ont été enregistrés, les données seront envoyées à Open Data Capture (si utilisé) et/ou téléchargées au format .csv si les paramètres de l'expérience ont été définis comme tels"
       }
+    },
+    yes: {
+      en: 'Yes',
+      fr: "Oui"
+    },
+    no: {
+      en: 'No',
+      fr: 'Non',
+    },
+    repeat: {
+      en: "Would like to repeat the last image?",
+      fr: "Voulez-vous répéter la dernière image"
     },
     continueToShowImage: {
       en: "Press button to show image. Image will display after 500 ms",

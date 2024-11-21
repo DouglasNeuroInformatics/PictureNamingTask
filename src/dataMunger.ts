@@ -1,4 +1,4 @@
-import { $ExperimentResults, $ParticipantIDTrial, $Settings } from "./schemas.ts";
+import { $ExperimentResults, $ParticipantIDTrial } from "./schemas.ts";
 
 import type {
   ExperimentResults,
@@ -11,7 +11,9 @@ import type { DataCollection } from "/runtime/v1/jspsych@8.x";
 
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
 
-function dataMunger(data: DataCollection): (ExperimentResults | ParticipantIDResult)[] {
+function dataMunger(
+  data: DataCollection,
+): (ExperimentResults | ParticipantIDResult)[] {
   const trials = data
     .filter({ trial_type: "survey-html-form" })
     .values() as LoggingTrial[];
@@ -31,7 +33,7 @@ function dataMunger(data: DataCollection): (ExperimentResults | ParticipantIDRes
       participantID: DOMPurify.sanitize(String(participantResult.response.Q0)),
     });
   }
-  const trialResults = trials.map(trial => {
+  const trialResults = trials.map((trial) => {
     return $ExperimentResults.parse({
       stimulus: trial.stimulus,
       correctResponse: trial.correctResponse,
@@ -49,61 +51,47 @@ function dataMunger(data: DataCollection): (ExperimentResults | ParticipantIDRes
   return results;
 }
 
-function arrayToCSV(array: (ExperimentResults | ParticipantIDResult)[]): string {
-
-  let csvContent = '';
-  // check for ID, need to fix error here. .participantID does exsits on this 
-  if (array[0].participantID!) {
-    csvContent += 'participantID\n';
-    csvContent += array[0].participantID + '\n';
+function arrayToCSV(
+  array: (ExperimentResults | ParticipantIDResult)[],
+): string {
+  let csvContent = "";
+  // check for ID, need to fix error here. .participantID does exsits on this
+  if ("participantID" in array[0]!) {
+    csvContent += "participantID\n";
+    csvContent += array[0].participantID + "\n";
   }
   // headers
-  csvContent += Object.keys(array[array.length - 1]!).join(',') + '\n';
+  csvContent += Object.keys(array[array.length - 1]!).join(",") + "\n";
   // append results to csv
   for (let item of array) {
-    if ('stimulus' in item) {
-      const results = Object.values(item).map(result => {
+    if ("stimulus" in item) {
+      const results = Object.values(item).map((result) => {
         // incase notes contain commas
-        if (typeof result === 'string' && result.includes((','))) {
-          return `"${result}"`
+        if (typeof result === "string" && result.includes(",")) {
+          return `"${result}"`;
         }
-        return result
-      })
-      const row = results.join(',')
-      csvContent += row + '\n'
+        return result;
+      });
+      const row = results.join(",");
+      csvContent += row + "\n";
     }
   }
 
   return csvContent;
 }
-// function settingsDataMunger(settings: Settings) {
-//
-//   return $Settings.parse({
-//     advancementSchedule: settings.advancementSchedule,
-//     downloadOnFinish: settings.downloadOnFinish,
-//     initialDifficulty: settings.initialDifficulty,
-//     language: settings.language,
-//     numberOfLevels: settings.numberOfLevels,
-//     regressionSchedule: settings.regressionSchedule,
-//     optionalSeed: settings.optionalSeed,
-//     totalNumberOfTrialsToRun: settings.totalNumberOfTrialsToRun,
-//   });
-//
-// }
 
 function settingsToCSV(settings: Settings): string {
-  console.log('settings')
-  console.table(settings)
+  const headers = Object.keys(settings).join(",");
+  const values = Object.values(settings)
+    .map((value) => {
+      if (value === undefined) return "";
+      if (typeof value === "boolean") return value.toString();
+      if (typeof value === "string" && value.includes(",")) return `"${value}"`;
+      return value;
+    })
+    .join(",");
 
-  const headers = Object.keys(settings).join(',');
-  const values = Object.values(settings).map(value => {
-    if (value === undefined) return '';
-    if (typeof value === 'boolean') return value.toString();
-    if (typeof value === 'string' && value.includes(',')) return `"${value}"`;
-    return value;
-  }).join(',');
-
-  return headers + '\n' + values + '\n';
+  return headers + "\n" + values + "\n";
 }
 
 function downloadCSV(dataForCSV: string, filename: string) {
@@ -131,24 +119,12 @@ function getLocalTime() {
   return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
 }
 
-function exportToJsonSerializable(data: ExperimentResults[], settings: Settings): {
+function exportToJsonSerializable(
+  data: ExperimentResults[],
+  settings: Settings,
+): {
   [key: string]: unknown;
 } {
-
-
-
-  const headers = Object.keys(settings).join(',');
-  const values = Object.values(settings).map(value => {
-    if (value === undefined) return '';
-    if (typeof value === 'boolean') return value.toString();
-    if (typeof value === 'string' && value.includes(',')) return `"${value}"`;
-    return value;
-  }).join(',');
-
-
-
-
-
   return {
     version: "1.1",
     timestamp: getLocalTime(),
@@ -159,7 +135,7 @@ function exportToJsonSerializable(data: ExperimentResults[], settings: Settings)
       language: settings.language,
       numberOfLevels: settings.numberOfLevels,
       regressionSchedule: settings.regressionSchedule,
-      optionalSeed: settings.optionalSeed,
+      optionalSeed: settings.seed,
       totalNumberOfTrialsToRun: settings.totalNumberOfTrialsToRun,
     },
     experimentResults: data
@@ -169,24 +145,26 @@ function exportToJsonSerializable(data: ExperimentResults[], settings: Settings)
         correctResponse: result.correctResponse,
         difficultyLevel: result.difficultyLevel,
         language: result.language,
-        rt: result.rt,
+        rt: result.participantResponseTime,
         responseResult: result.responseResult,
         responseNotes: result.responseNotes,
         responseResultAsNumber: result.responseResultAsNumber,
       })),
-
   };
 }
 
 export function transformAndDownload(data: DataCollection, settings: Settings) {
   const mungedData = dataMunger(data) as ExperimentResults[];
   const dataForCSV = arrayToCSV(mungedData);
-  const settingsDataForCsv = settingsToCSV(settings)
+  const settingsDataForCsv = settingsToCSV(settings);
   const currentDate = getLocalTime();
   downloadCSV(dataForCSV, `${currentDate}.csv`);
-  downloadCSV(settingsDataForCsv, `${currentDate}-Settings.csv`)
+  downloadCSV(settingsDataForCsv, `${currentDate}-Settings.csv`);
 }
-export function transformAndExportJson(data: DataCollection, settings: Settings): any {
+export function transformAndExportJson(
+  data: DataCollection,
+  settings: Settings,
+): any {
   const mungedData = dataMunger(data) as ExperimentResults[];
   const jsonSerializableData = exportToJsonSerializable(mungedData, settings);
   return JSON.parse(JSON.stringify(jsonSerializableData));

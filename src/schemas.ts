@@ -14,6 +14,10 @@ const $Trial = z.object({
   // snake_case due to jsPsych
   trial_type: z.string(),
 });
+
+const $RepeatTrial = $Trial.extend({
+  response: z.number().int(),
+});
 export const $ParticipantIDTrial = $Trial.extend({
   response: $ParticipantID,
 });
@@ -47,8 +51,11 @@ export const $Settings = z.object({
   numberOfLevels: z.coerce.number().positive().int(),
   regressionSchedule: z.coerce.number().int(),
   seed: z.preprocess(
-    (val) => val === '' || val === null || val === 0 || val === undefined ? undefined : val,
-    z.coerce.number().positive().int().optional()
+    (val) =>
+      val === "" || val === null || val === 0 || val === undefined
+        ? undefined
+        : val,
+    z.coerce.number().positive().int().optional(),
   ),
   totalNumberOfTrialsToRun: z.coerce.number().positive().int(),
 });
@@ -70,3 +77,4 @@ export type ExperimentResults = z.infer<typeof $ExperimentResults>;
 export type Settings = z.infer<typeof $Settings>;
 export type ExperimentImage = z.infer<typeof $ExperimentImage>;
 export type ExperimentResultsUnion = z.infer<typeof $ExperimentResultsUnion>;
+export type RepeatTrial = z.infer<typeof $RepeatTrial>;

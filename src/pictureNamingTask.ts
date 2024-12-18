@@ -211,17 +211,16 @@ experimentStimuli
       button_label: i18n.t("continue"),
       type: SurveyTextPlugin,
     };
+
     const instructions = {
       stimulus: function () {
         const html = `
           <div class="instructions-container">
            <div class="instructions-content">
             <h1>${i18n.t("task.title")}</h1>
-        
              <div class="instructions-intro">
               <p>${i18n.t("task.intro")}</p>
              </div>
-
             <ul class="instructions-steps">
               <li class="instructions-step">${i18n.t("task.step1")}</li>
               <li class="instructions-step">${i18n.t("task.step2")}</li>
@@ -231,7 +230,6 @@ experimentStimuli
               <li class="instructions-step">${i18n.t("task.step6")}</li>
               <li class="instructions-step">${i18n.t("task.step7")}</li>
             </ul>
-
             <div class="instructions-completion">
               <p>${i18n.t("task.completion")}</p>
             </div>
@@ -308,15 +306,17 @@ experimentStimuli
            onclick="
              document.getElementById('result').value='${i18n.t("correct")}';
              document.getElementById('resultAsNumber').value='${valueIfCorrect}';
+             document.getElementById('result').style.color='green'
            ">
           <input type="button" value="${i18n.t("incorrect")}" 
            onclick="
              document.getElementById('result').value='${i18n.t("incorrect")}';
              document.getElementById('resultAsNumber').value='${valueIfIncorrect}';
+             document.getElementById('result').style.color='red'
            ">
           <br>
           <label for="result">${i18n.t("responseWas")}</label>
-          <mark><output  id="result" name="result" ></output></mark>
+          <output  id="result" name="result" ></output>
           <hr>
           <h4>${i18n.t("logNotes")}</h4>
           <textarea id="textBox" name="notes" placeholder="${i18n.t("logResponse")}"></textarea>

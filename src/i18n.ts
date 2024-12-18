@@ -9,7 +9,7 @@ const i18n = createI18Next({
       fr: "Bienvenue. Appuyez sur n'importe quelle touche pour commencer",
     },
     enterID: {
-      en: "Enter particpent ID",
+      en: "Enter participant ID",
       fr: "Entrez l'ID de participant",
     },
     task: {

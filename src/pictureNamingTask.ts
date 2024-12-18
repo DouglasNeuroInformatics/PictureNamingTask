@@ -1,5 +1,3 @@
-// needs to be updated to version 2 in ODC runtime
-import htmlButtonResponse from "@jspsych/plugin-html-button-response";
 import type { Language } from "@opendatacapture/runtime-v1/@opendatacapture/runtime-core/index.js";
 
 import { transformAndDownload, transformAndExportJson } from "./dataMunger.ts";
@@ -20,6 +18,7 @@ import { stimuliPaths } from "./stimuliPaths.ts";
 
 import "./styles/instructions.css";
 
+import { HtmlButtonResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-button-response@2.x";
 import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x";
 import { ImageKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x";
 import { PreloadPlugin } from "/runtime/v1/@jspsych/plugin-preload@2.x";
@@ -239,7 +238,7 @@ experimentStimuli
         return html;
       },
       choices: [i18n.t("continue")],
-      type: htmlButtonResponse,
+      type: HtmlButtonResponsePlugin,
     };
     const preload = {
       auto_preload: true,
@@ -250,12 +249,12 @@ experimentStimuli
     const pageBeforeImage = {
       stimulus: i18n.t("continueToShowImage"),
       choices: [i18n.t("continue")],
-      type: htmlButtonResponse,
+      type: HtmlButtonResponsePlugin,
     };
     const pageAfterImage = {
       stimulus: i18n.t("passToTA"),
       choices: [i18n.t("continue")],
-      type: htmlButtonResponse,
+      type: HtmlButtonResponsePlugin,
     };
 
     const blankPage = {
@@ -360,7 +359,7 @@ experimentStimuli
     };
 
     const repeatButtonTrial = {
-      type: htmlButtonResponse,
+      type: HtmlButtonResponsePlugin,
       stimulus: i18n.t("repeat"),
       choices: [i18n.t("yes"), i18n.t("no")],
       on_finish: function (data: RepeatTrial) {

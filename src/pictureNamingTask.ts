@@ -18,7 +18,7 @@ import {
 } from "./schemas.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
 
-import "./styles/instuctions.css";
+import "./styles/instructions.css";
 
 import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x";
 import { ImageKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x";

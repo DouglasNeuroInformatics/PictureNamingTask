@@ -11,17 +11,23 @@ import {
   type ExperimentImage,
   type LoggingTrial,
   type ParticipantResponse,
+  type RepeatTrial,
+  type Settings,
 } from "./schemas.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
 
+import "./styles/instructions.css";
+
+import { HtmlButtonResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-button-response@2.x";
 import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x";
 import { ImageKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x";
 import { PreloadPlugin } from "/runtime/v1/@jspsych/plugin-preload@2.x";
 import { SurveyHtmlFormPlugin } from "/runtime/v1/@jspsych/plugin-survey-html-form@2.x";
+import { SurveyTextPlugin } from "/runtime/v1/@jspsych/plugin-survey-text@2.x";
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
 import { initJsPsych } from "/runtime/v1/jspsych@8.x";
 import { JsPsych } from "/runtime/v1/jspsych@8.x";
-import {
+import PureRand, {
   uniformIntDistribution,
   xoroshiro128plus,
 } from "/runtime/v1/pure-rand@6.x";
@@ -33,18 +39,19 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
   // variables for controlling advancementSchedule, regressionSchedule, and when the experiment is finished
   //
   // can be read from either the csv files in public/ or via json if using the instrument playground
-
+  let shouldRepeatTrial = false;
   let numberOfCorrectAnswers = 0;
   let numberOfTrialsRun = 1;
   let settingsParseResult;
   let imageDBParseResult;
-
+  let includeParticipantID = false;
   if (useJsonState.value) {
     settingsParseResult = $Settings.safeParse(experimentSettingsJson);
     imageDBParseResult = $ExperimentImage.array().safeParse(stimuliPaths);
   } else {
     settingsParseResult = $Settings.safeParse(experimentSettingsCSV);
     imageDBParseResult = $ExperimentImage.array().safeParse(imageDbCSV);
+    includeParticipantID = true;
   }
 
   if (!settingsParseResult.success) {
@@ -64,10 +71,13 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
     regressionSchedule,
     language,
     numberOfLevels,
-    seed,
     downloadOnFinish,
     initialDifficulty,
   } = settingsParseResult.data;
+  let seed: number | undefined;
+  if (typeof settingsParseResult.data.seed === "number") {
+    seed = settingsParseResult.data.seed;
+  }
 
   // small hack to get around i18n issues with wait for changeLanguage
   i18n.changeLanguage(language as Language);
@@ -81,7 +91,13 @@ experimentStimuli
 */
 
   const indiciesSelected = new Set();
-  let rng = xoroshiro128plus(seed);
+  let rng: PureRand.RandomGenerator;
+  if (seed) {
+    rng = xoroshiro128plus(seed);
+  } else {
+    seed = Date.now() ^ (Math.random() * 0x100000000);
+    rng = xoroshiro128plus(seed);
+  }
 
   // closure
   function getRandomElementWithSeed(
@@ -153,52 +169,108 @@ experimentStimuli
     const jsPsych = initJsPsych({
       on_finish: function () {
         const data = jsPsych.data.get();
+        const settings: Settings = {
+          totalNumberOfTrialsToRun,
+          advancementSchedule,
+          regressionSchedule,
+          language,
+          numberOfLevels,
+          downloadOnFinish,
+          initialDifficulty,
+          seed,
+        };
         if (downloadOnFinish) {
-          transformAndDownload(data);
+          transformAndDownload(data, settings);
         }
         if (onFinish) {
-          onFinish(transformAndExportJson(data));
+          onFinish(transformAndExportJson(data, settings));
         }
       },
     });
 
     const welcome = {
       on_start: function () {
-        document.addEventListener(
-          "click",
-          () => simulateKeyPress(jsPsych, "a"),
-          { once: true },
-        );
+        const handleClick = () => simulateKeyPress(jsPsych, "a");
+        document.addEventListener("click", handleClick, { once: true });
+      },
+      on_finish: function () {
+        const handleClick = () => simulateKeyPress(jsPsych, "a");
+        document.removeEventListener("click", handleClick);
       },
       stimulus: i18n.t("welcome"),
       type: HtmlKeyboardResponsePlugin,
     };
 
+    const particpantIDPage = {
+      questions: [
+        {
+          prompt: i18n.t("enterID"),
+        },
+      ],
+      button_label: i18n.t("continue"),
+      type: SurveyTextPlugin,
+    };
+
+    const instructions = {
+      stimulus: function () {
+        const html = `
+          <div class="instructions-container">
+           <div class="instructions-content">
+            <h1>${i18n.t("task.title")}</h1>
+             <div class="instructions-intro">
+              <p>${i18n.t("task.intro")}</p>
+             </div>
+            <ul class="instructions-steps">
+              <li class="instructions-step">${i18n.t("task.step1")}</li>
+              <li class="instructions-step">${i18n.t("task.step2")}</li>
+              <li class="instructions-step">${i18n.t("task.step3")}</li>
+              <li class="instructions-step">${i18n.t("task.step4")}</li>
+              <li class="instructions-step">${i18n.t("task.step5")}</li>
+              <li class="instructions-step">${i18n.t("task.step6")}</li>
+              <li class="instructions-step">${i18n.t("task.step7")}</li>
+            </ul>
+            <div class="instructions-completion">
+              <p>${i18n.t("task.completion")}</p>
+            </div>
+          </div>
+        </div>
+        `;
+        return html;
+      },
+      choices: [i18n.t("continue")],
+      type: HtmlButtonResponsePlugin,
+    };
     const preload = {
       auto_preload: true,
       message: `<p>loading stimulus</p>`,
       show_progress_bar: true,
       type: PreloadPlugin,
     };
+    const pageBeforeImage = {
+      stimulus: i18n.t("continueToShowImage"),
+      choices: [i18n.t("continue")],
+      type: HtmlButtonResponsePlugin,
+    };
+    const pageAfterImage = {
+      stimulus: i18n.t("passToTA"),
+      choices: [i18n.t("continue")],
+      type: HtmlButtonResponsePlugin,
+    };
 
     const blankPage = {
-      on_start: function () {
-        document.addEventListener(
-          "click",
-          () => simulateKeyPress(jsPsych, "a"),
-          { once: true },
-        );
-      },
       stimulus: "",
+      choices: "NO_KEYS",
+      trial_duration: 500,
       type: HtmlKeyboardResponsePlugin,
     };
     const showImg = {
       on_start: function () {
-        document.addEventListener(
-          "click",
-          () => simulateKeyPress(jsPsych, "a"),
-          { once: true },
-        );
+        const handleClick = () => simulateKeyPress(jsPsych, "a");
+        document.addEventListener("click", handleClick, { once: true });
+      },
+      on_finish: function () {
+        const handleClick = () => simulateKeyPress(jsPsych, "a");
+        document.removeEventListener("click", handleClick);
       },
       stimulus: jsPsych.timelineVariable("stimulus"),
       stimulus_height: 600,
@@ -208,36 +280,70 @@ experimentStimuli
     const logging = {
       autofocus: "textBox",
       button_label: i18n.t("submit"),
-      data: {
-        stimulus: jsPsych.timelineVariable("stimulus"),
-        correctResponse: jsPsych.timelineVariable("correctResponse"),
-        difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
-        language: jsPsych.timelineVariable("language"),
+      data: function () {
+        const rt = jsPsych.data
+          .get()
+          .filter({ trial_type: "image-keyboard-response" })
+          .last()
+          .select("rt").values[0] as string;
+
+        return {
+          stimulus: jsPsych.timelineVariable("stimulus"),
+          correctResponse: jsPsych.timelineVariable("correctResponse"),
+          difficultyLevel: jsPsych.timelineVariable("difficultyLevel"),
+          language: jsPsych.timelineVariable("language"),
+          participantResponseTime: rt,
+        };
       },
       html: function () {
+        const valueIfCorrect = 1;
+        const valueIfIncorrect = 0;
         const html = `
+          <input type="hidden" id="resultAsNumber" name="resultAsNumber" value=''>
           <h3>${i18n.t("logResponse")}</h3>
-          <input type="button" value="${i18n.t("correct")}" onclick="document.getElementById('result').value='${i18n.t("correct")}';">
-          <input type="button" value="${i18n.t("incorrect")}" onclick="document.getElementById('result').value='${i18n.t("incorrect")}';">
+          <input type="button" value="${i18n.t("correct")}" 
+           onclick="
+             document.getElementById('result').value='${i18n.t("correct")}';
+             document.getElementById('resultAsNumber').value='${valueIfCorrect}';
+             document.getElementById('result').style.color='green'
+           ">
+          <input type="button" value="${i18n.t("incorrect")}" 
+           onclick="
+             document.getElementById('result').value='${i18n.t("incorrect")}';
+             document.getElementById('resultAsNumber').value='${valueIfIncorrect}';
+             document.getElementById('result').style.color='red'
+           ">
           <br>
           <label for="result">${i18n.t("responseWas")}</label>
-          <input type="text" id="result" name="result" readonly>
+          <output  id="result" name="result" ></output>
           <hr>
-          <input type="text" id="textBox" name="notes" placeholder="${i18n.t("logResponse")}">
+          <h4>${i18n.t("logNotes")}</h4>
+          <textarea id="textBox" name="notes" placeholder="${i18n.t("logResponse")}"></textarea>
           <p>${i18n.t("logResponseToContinue")}</p>`;
         return html;
       },
       on_load: function () {
+        if (shouldRepeatTrial) {
+          const trialData = {
+            rt: 1,
+            response: {
+              notes: "Trial repeated",
+              result: "Incorrect",
+              resultAsNumber: "0",
+            },
+          };
+          jsPsych.finishTrial(trialData);
+        }
         const submitButton = document.getElementById(
           "jspsych-survey-html-form-next",
         ) as HTMLButtonElement;
-        const resultInput = document.getElementById(
+        const resultOutput = document.getElementById(
           "result",
-        ) as HTMLInputElement;
+        ) as HTMLOutputElement;
         submitButton.disabled = true;
         document.querySelectorAll('input[type="button"]').forEach((button) => {
           button.addEventListener("click", () => {
-            if (resultInput.value !== "") {
+            if (resultOutput.value) {
               submitButton.disabled = false;
             }
           });
@@ -251,32 +357,59 @@ experimentStimuli
       },
       type: SurveyHtmlFormPlugin,
     };
-    const testProcedure = {
-      // to reload the experimentStimuli after one repetition has been completed
-      on_timeline_start: function () {
-        this.timeline_variables = experimentStimuli;
+
+    const repeatButtonTrial = {
+      type: HtmlButtonResponsePlugin,
+      stimulus: i18n.t("repeat"),
+      choices: [i18n.t("yes"), i18n.t("no")],
+      on_finish: function (data: RepeatTrial) {
+        if (data.response === 0) {
+          shouldRepeatTrial = true;
+        } else {
+          shouldRepeatTrial = false;
+        }
       },
-      timeline: [preload, blankPage, showImg, blankPage, logging],
+    };
+
+    const testProcedure = {
+      on_timeline_start: function () {
+        // If not repeating, load new stimuli
+        // If repeating, keep the current timeline_variables
+        if (!shouldRepeatTrial) {
+          this.timeline_variables = experimentStimuli;
+        }
+      },
+      timeline: [
+        preload,
+        pageBeforeImage,
+        blankPage,
+        showImg,
+        pageAfterImage,
+        repeatButtonTrial,
+        logging,
+      ],
       timeline_variables: experimentStimuli,
     };
+
     timeline.push(testProcedure);
 
     const loop_node = {
       loop_function: function () {
-        // tracking number of corret answers
-        // need to access logging trial info
-        let clearSet = false;
+        if (shouldRepeatTrial) {
+          return true;
+        }
 
+        let clearSet = false;
         if (numberOfTrialsRun === totalNumberOfTrialsToRun) {
           return false;
         }
+
         // getting the most recent logged result
         const loggingResponseArray = jsPsych.data
           .get()
           .filter({ trial_type: "survey-html-form" })
           .values() as LoggingTrial[];
         const lastTrialIndex = loggingResponseArray.length - 1;
-
         const lastTrialResults: ParticipantResponse =
           loggingResponseArray[lastTrialIndex]!.response;
 
@@ -286,11 +419,11 @@ experimentStimuli
         } else if (lastTrialResults.result === "Incorrect") {
           numberOfCorrectAnswers = 0;
         }
-        // difficulty level logic, <x> correct answers in a row, increase, <y> incorrect answer decrease
+
+        // difficulty level logic
         if (numberOfCorrectAnswers === advancementSchedule) {
           if (numberOfCorrectAnswers <= numberOfLevels) {
             currentDifficultyLevel++;
-            // need to reset as difficulty has changed
             numberOfCorrectAnswers = 0;
             clearSet = true;
           }
@@ -299,16 +432,23 @@ experimentStimuli
             currentDifficultyLevel--;
           }
         }
+
         experimentStimuli = createStimuli(
           currentDifficultyLevel,
           language,
           clearSet,
         );
+
         numberOfTrialsRun++;
         return true;
       },
       timeline,
     };
-    void jsPsych.run([welcome, loop_node]);
+
+    if (includeParticipantID) {
+      void jsPsych.run([welcome, instructions, particpantIDPage, loop_node]);
+    } else {
+      void jsPsych.run([welcome, instructions, loop_node]);
+    }
   })();
 }

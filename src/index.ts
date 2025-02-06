@@ -2,7 +2,7 @@ import type { Language } from "/runtime/v1/@opendatacapture/runtime-core";
 
 import { experimentSettingsJson } from "./experimentSettings.ts";
 import { pictureNamingTask } from "./pictureNamingTask.ts";
-import { $ODCExport, $Settings } from "./schemas.ts";
+import { $ExperimentResults, $Settings } from "./schemas.ts";
 import { translator } from "./translator.ts";
 
 import "/runtime/v1/jspsych@8.x/css/jspsych.css";
@@ -47,6 +47,6 @@ export default defineInstrument({
   validationSchema: z.object({
     version: z.string(),
     timestamp: z.string(),
-    experimentResults: z.array($ODCExport),
+    experimentResults: z.array($ExperimentResults),
   }),
 });

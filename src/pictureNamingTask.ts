@@ -25,14 +25,14 @@ import "./instructions.css";
 export async function pictureNamingTask(onFinish?: (data: any) => void) {
   // need to do dynamic imports to satisfy ODC instrument bundler
   const { ImageKeyboardResponsePlugin } = await import(
-    "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x"
+    "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x/index.js"
   );
 
   const { SurveyHtmlFormPlugin } = await import(
-    "/runtime/v1/@jspsych/plugin-survey-html-form@2.x"
+    "/runtime/v1/@jspsych/plugin-survey-html-form@2.x/index.js"
   );
   const { SurveyTextPlugin } = await import(
-    "/runtime/v1/@jspsych/plugin-survey-text@2.x"
+    "/runtime/v1/@jspsych/plugin-survey-text@2.x/index.js"
   );
 
   const { HtmlButtonResponsePlugin } = await import(

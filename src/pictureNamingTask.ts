@@ -1,8 +1,13 @@
 import type { Language } from "@opendatacapture/runtime-v1/@opendatacapture/runtime-core/index.js";
 
+import { DOMPurify } from "/runtime/v1/dompurify@3.x";
+import PureRand, {
+  uniformIntDistribution,
+  xoroshiro128plus,
+} from "/runtime/v1/pure-rand@6.x";
+
 import { transformAndDownload, transformAndExportJson } from "./dataMunger.ts";
 import { experimentSettingsJson } from "./experimentSettings.ts";
-import { translator } from "./translator.ts";
 import {
   $ExperimentImage,
   $Settings,
@@ -13,24 +18,34 @@ import {
   type Settings,
 } from "./schemas.ts";
 import { stimuliPaths } from "./stimuliPaths.ts";
+import { translator } from "./translator.ts";
 
-import "./styles/instructions.css";
-
-import { HtmlButtonResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-button-response@2.x";
-import { HtmlKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x";
-import { ImageKeyboardResponsePlugin } from "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x";
-import { PreloadPlugin } from "/runtime/v1/@jspsych/plugin-preload@2.x";
-import { SurveyHtmlFormPlugin } from "/runtime/v1/@jspsych/plugin-survey-html-form@2.x";
-import { SurveyTextPlugin } from "/runtime/v1/@jspsych/plugin-survey-text@2.x";
-import { DOMPurify } from "/runtime/v1/dompurify@3.x";
-import { initJsPsych } from "/runtime/v1/jspsych@8.x";
-import { JsPsych } from "/runtime/v1/jspsych@8.x";
-import PureRand, {
-  uniformIntDistribution,
-  xoroshiro128plus,
-} from "/runtime/v1/pure-rand@6.x";
+import "./instructions.css";
 
 export async function pictureNamingTask(onFinish?: (data: any) => void) {
+  // need to do dynamic imports to satisfy ODC instrument bundler
+  const { ImageKeyboardResponsePlugin } = await import(
+    "/runtime/v1/@jspsych/plugin-image-keyboard-response@2.x"
+  );
+
+  const { SurveyHtmlFormPlugin } = await import(
+    "/runtime/v1/@jspsych/plugin-survey-html-form@2.x"
+  );
+  const { SurveyTextPlugin } = await import(
+    "/runtime/v1/@jspsych/plugin-survey-text@2.x"
+  );
+
+  const { HtmlButtonResponsePlugin } = await import(
+    "/runtime/v1/@jspsych/plugin-html-button-response@2.x/index.js"
+  );
+  const { HtmlKeyboardResponsePlugin } = await import(
+    "/runtime/v1/@jspsych/plugin-html-keyboard-response@2.x/index.js"
+  );
+  const { PreloadPlugin } = await import(
+    "/runtime/v1/@jspsych/plugin-preload@2.x/index.js"
+  );
+  const { initJsPsych } = await import("/runtime/v1/jspsych@8.x/index.js");
+  type JsPsych = import("/runtime/v1/jspsych@8.x/index.js").JsPsych;
   //****************************
   //****EXPERIMENT_SETTINGS*****
   //****************************

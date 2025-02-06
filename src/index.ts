@@ -1,40 +1,52 @@
-import { experimentSettingsJson } from "./experimentSettings.ts";
-import { useJsonState } from "./globalState.ts";
-import { pictureNamingTask } from "./pictureNamingTask.ts";
-import { $ExperimentResults } from "./schemas.ts";
-
 import type { Language } from "/runtime/v1/@opendatacapture/runtime-core";
+import { z } from "/runtime/v1/zod@3.23.x";
+
+import { experimentSettingsJson } from "./experimentSettings.ts";
+import { pictureNamingTask } from "./pictureNamingTask.ts";
+import { $ExperimentResults, $Settings } from "./schemas.ts";
+import { translator } from "./translator.ts";
 
 import "/runtime/v1/jspsych@8.x/css/jspsych.css";
-
-import { defineInstrument } from "/runtime/v1/@opendatacapture/runtime-core";
-
-// the ODC playground uses the index.ts file while deploying locally used main.ts
-// this next block allows the program to read from the json rather than the csv files
-if (!useJsonState.value) {
-  useJsonState.set = true;
-}
+const { defineInstrument } = await import(
+  "/runtime/v1/@opendatacapture/runtime-core/index.js"
+);
 
 export default defineInstrument({
   kind: "INTERACTIVE",
   language: experimentSettingsJson.language as Language,
   internal: {
     edition: 1,
-    name: "PictureNamingTask",
+    name: "pictureNamingTask",
   },
-  tags: ["interactive", "jsPysch", "PictureNamingTask"],
+  tags: ["interactive", "jsPsych", "pictureNamingTask"],
   content: {
     async render(done) {
+      const settingsParseResult = $Settings.safeParse(experimentSettingsJson);
+
+      // parse settings
+      if (!settingsParseResult.success) {
+        throw new Error("validation error, check experiment settings", {
+          cause: settingsParseResult.error,
+        });
+      }
+
+      translator.init();
+      translator.changeLanguage(settingsParseResult.data.language);
       await pictureNamingTask(done);
     },
   },
   details: {
-    description: "A jsPysch implementation of the Boston Naming Task",
-    estimatedDuration: 1,
+    description:
+      "A digitial implementation of the Boston Naming Task with adaptive difficulty levels",
+    estimatedDuration: 15,
     instructions: ["<PLACEHOLDER>"],
-    license: "Apache-2.0",
+    license: "UNLICENSED",
     title: "Picture Naming Task",
   },
   measures: {},
-  validationSchema: $ExperimentResults,
+  validationSchema: z.object({
+    version: z.string(),
+    timestamp: z.string(),
+    experimentResults: z.array($ExperimentResults),
+  }),
 });

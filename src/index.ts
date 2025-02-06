@@ -1,4 +1,5 @@
 import type { Language } from "/runtime/v1/@opendatacapture/runtime-core";
+import { z } from "/runtime/v1/zod@3.23.x";
 
 import { experimentSettingsJson } from "./experimentSettings.ts";
 import { pictureNamingTask } from "./pictureNamingTask.ts";
@@ -6,7 +7,6 @@ import { $ExperimentResults, $Settings } from "./schemas.ts";
 import { translator } from "./translator.ts";
 
 import "/runtime/v1/jspsych@8.x/css/jspsych.css";
-import { z } from "/runtime/v1/zod@3.23.x";
 const { defineInstrument } = await import(
   "/runtime/v1/@opendatacapture/runtime-core/index.js"
 );

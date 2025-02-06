@@ -26,6 +26,7 @@ const $LoggingTrial = $Trial.extend({
   difficultyLevel: z.coerce.number().positive().int(),
   language: $Language,
   response: $ParticipantResponse,
+  // rt in milliseconds
   rt: z.coerce.number().positive().int(),
   stimulus: z.string(),
 });

@@ -1,5 +1,3 @@
-import type { Language } from "@opendatacapture/runtime-v1/@opendatacapture/runtime-core/index.js";
-
 import { DOMPurify } from "/runtime/v1/dompurify@3.x";
 import PureRand, {
   uniformIntDistribution,

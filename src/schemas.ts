@@ -26,7 +26,8 @@ const $LoggingTrial = $Trial.extend({
   difficultyLevel: z.coerce.number().positive().int(),
   language: $Language,
   response: $ParticipantResponse,
-  participantResponseTime: z.coerce.number().positive().int(),
+  // rt in milliseconds
+  rt: z.coerce.number().positive().int(),
   stimulus: z.string(),
 });
 export const $ExperimentResults = $LoggingTrial

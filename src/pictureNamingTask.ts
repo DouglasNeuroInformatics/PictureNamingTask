@@ -2,9 +2,7 @@ import type { Language } from "@opendatacapture/runtime-v1/@opendatacapture/runt
 
 import { transformAndDownload, transformAndExportJson } from "./dataMunger.ts";
 import { experimentSettingsJson } from "./experimentSettings.ts";
-import { experimentSettingsCSV, imageDbCSV } from "./fetchAndParse.ts";
-import { useJsonState } from "./globalState.ts";
-import i18n from "./i18n.ts";
+import { translator } from "./translator.ts";
 import {
   $ExperimentImage,
   $Settings,
@@ -42,17 +40,9 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
   let shouldRepeatTrial = false;
   let numberOfCorrectAnswers = 0;
   let numberOfTrialsRun = 1;
-  let settingsParseResult;
-  let imageDBParseResult;
   let includeParticipantID = false;
-  if (useJsonState.value) {
-    settingsParseResult = $Settings.safeParse(experimentSettingsJson);
-    imageDBParseResult = $ExperimentImage.array().safeParse(stimuliPaths);
-  } else {
-    settingsParseResult = $Settings.safeParse(experimentSettingsCSV);
-    imageDBParseResult = $ExperimentImage.array().safeParse(imageDbCSV);
-    includeParticipantID = true;
-  }
+  const settingsParseResult = $Settings.safeParse(experimentSettingsJson);
+  const imageDBParseResult = $ExperimentImage.array().safeParse(stimuliPaths);
 
   if (!settingsParseResult.success) {
     throw new Error("validation error, check experiment settings", {
@@ -78,12 +68,6 @@ export async function pictureNamingTask(onFinish?: (data: any) => void) {
   if (typeof settingsParseResult.data.seed === "number") {
     seed = settingsParseResult.data.seed;
   }
-
-  // small hack to get around i18n issues with wait for changeLanguage
-  i18n.changeLanguage(language as Language);
-  await new Promise(function (resolve) {
-    i18n.onLanguageChange = resolve;
-  });
 
   /*
 functions for generating
@@ -197,17 +181,17 @@ experimentStimuli
         const handleClick = () => simulateKeyPress(jsPsych, "a");
         document.removeEventListener("click", handleClick);
       },
-      stimulus: i18n.t("welcome"),
+      stimulus: translator.t("welcome"),
       type: HtmlKeyboardResponsePlugin,
     };
 
     const particpantIDPage = {
       questions: [
         {
-          prompt: i18n.t("enterID"),
+          prompt: translator.t("enterID"),
         },
       ],
-      button_label: i18n.t("continue"),
+      button_label: translator.t("continue"),
       type: SurveyTextPlugin,
     };
 
@@ -216,28 +200,28 @@ experimentStimuli
         const html = `
           <div class="instructions-container">
            <div class="instructions-content">
-            <h1>${i18n.t("task.title")}</h1>
+            <h1>${translator.t("task.title")}</h1>
              <div class="instructions-intro">
-              <p>${i18n.t("task.intro")}</p>
+              <p>${translator.t("task.intro")}</p>
              </div>
             <ul class="instructions-steps">
-              <li class="instructions-step">${i18n.t("task.step1")}</li>
-              <li class="instructions-step">${i18n.t("task.step2")}</li>
-              <li class="instructions-step">${i18n.t("task.step3")}</li>
-              <li class="instructions-step">${i18n.t("task.step4")}</li>
-              <li class="instructions-step">${i18n.t("task.step5")}</li>
-              <li class="instructions-step">${i18n.t("task.step6")}</li>
-              <li class="instructions-step">${i18n.t("task.step7")}</li>
+              <li class="instructions-step">${translator.t("task.step1")}</li>
+              <li class="instructions-step">${translator.t("task.step2")}</li>
+              <li class="instructions-step">${translator.t("task.step3")}</li>
+              <li class="instructions-step">${translator.t("task.step4")}</li>
+              <li class="instructions-step">${translator.t("task.step5")}</li>
+              <li class="instructions-step">${translator.t("task.step6")}</li>
+              <li class="instructions-step">${translator.t("task.step7")}</li>
             </ul>
             <div class="instructions-completion">
-              <p>${i18n.t("task.completion")}</p>
+              <p>${translator.t("task.completion")}</p>
             </div>
           </div>
         </div>
         `;
         return html;
       },
-      choices: [i18n.t("continue")],
+      choices: [translator.t("continue")],
       type: HtmlButtonResponsePlugin,
     };
     const preload = {
@@ -247,13 +231,13 @@ experimentStimuli
       type: PreloadPlugin,
     };
     const pageBeforeImage = {
-      stimulus: i18n.t("continueToShowImage"),
-      choices: [i18n.t("continue")],
+      stimulus: translator.t("continueToShowImage"),
+      choices: [translator.t("continue")],
       type: HtmlButtonResponsePlugin,
     };
     const pageAfterImage = {
-      stimulus: i18n.t("passToTA"),
-      choices: [i18n.t("continue")],
+      stimulus: translator.t("passToTA"),
+      choices: [translator.t("continue")],
       type: HtmlButtonResponsePlugin,
     };
 
@@ -279,7 +263,7 @@ experimentStimuli
 
     const logging = {
       autofocus: "textBox",
-      button_label: i18n.t("submit"),
+      button_label: translator.t("submit"),
       data: function () {
         const rt = jsPsych.data
           .get()
@@ -300,26 +284,26 @@ experimentStimuli
         const valueIfIncorrect = 0;
         const html = `
           <input type="hidden" id="resultAsNumber" name="resultAsNumber" value=''>
-          <h3>${i18n.t("logResponse")}</h3>
-          <input type="button" value="${i18n.t("correct")}" 
+          <h3>${translator.t("logResponse")}</h3>
+          <input type="button" value="${translator.t("correct")}" 
            onclick="
-             document.getElementById('result').value='${i18n.t("correct")}';
+             document.getElementById('result').value='${translator.t("correct")}';
              document.getElementById('resultAsNumber').value='${valueIfCorrect}';
              document.getElementById('result').style.color='green'
            ">
-          <input type="button" value="${i18n.t("incorrect")}" 
+          <input type="button" value="${translator.t("incorrect")}" 
            onclick="
-             document.getElementById('result').value='${i18n.t("incorrect")}';
+             document.getElementById('result').value='${translator.t("incorrect")}';
              document.getElementById('resultAsNumber').value='${valueIfIncorrect}';
              document.getElementById('result').style.color='red'
            ">
           <br>
-          <label for="result">${i18n.t("responseWas")}</label>
+          <label for="result">${translator.t("responseWas")}</label>
           <output  id="result" name="result" ></output>
           <hr>
-          <h4>${i18n.t("logNotes")}</h4>
-          <textarea id="textBox" name="notes" placeholder="${i18n.t("logResponse")}"></textarea>
-          <p>${i18n.t("logResponseToContinue")}</p>`;
+          <h4>${translator.t("logNotes")}</h4>
+          <textarea id="textBox" name="notes" placeholder="${translator.t("logResponse")}"></textarea>
+          <p>${translator.t("logResponseToContinue")}</p>`;
         return html;
       },
       on_load: function () {
@@ -350,7 +334,7 @@ experimentStimuli
         });
       },
       preamble: function () {
-        const html = `<h3>${i18n.t("correctResponse")}</h3>
+        const html = `<h3>${translator.t("correctResponse")}</h3>
                     <p>${jsPsych.evaluateTimelineVariable("correctResponse")}</p>
                     <img src="${jsPsych.evaluateTimelineVariable("stimulus")}" width="300" height="300">`;
         return DOMPurify.sanitize(html);
@@ -360,8 +344,8 @@ experimentStimuli
 
     const repeatButtonTrial = {
       type: HtmlButtonResponsePlugin,
-      stimulus: i18n.t("repeat"),
-      choices: [i18n.t("yes"), i18n.t("no")],
+      stimulus: translator.t("repeat"),
+      choices: [translator.t("yes"), translator.t("no")],
       on_finish: function (data: RepeatTrial) {
         if (data.response === 0) {
           shouldRepeatTrial = true;

@@ -1,0 +1,13 @@
+site_name: Picture Naming Task
+site_description: Documentation for Picture Naming Task
+site_url: https://picturenamingTask.readthedocs.io/
+repo_url: https://github.com/DouglasNeuroInformatics/PictureNamingTask
+repo_name: DouglasNeuroInformatics/PictureNamingTask
+
+nav:
+  - index.md
+theme:
+  name: material
+markdown_extensions:
+  - admonition
+  - footnotes

@@ -1,8 +1,8 @@
 # Picture Naming Task
 
 
-This is task is a modernized version of a classic neuropsychological task known as a "picture naming task", 
-where an individual is presented with a set of pictures of sheet of paper and asked to name each of them (The "Boston Naming Test"[^1] being the most frequently used).
+This task is a modernized version of a classic neuropsychological task known as a "picture naming task", 
+where an individual is presented with a set of pictures on sheets of paper and asked to name each of them (The "Boston Naming Test"[^1] being the most frequently used).
 The classic task is "fixed" in terms of the number of images and which images are shown.
 Classically, the number correct and the answer provided are recorded as a measurement.
 This expands on the classic version by allowing a user to add and remove stimuli as they deem necessary.
@@ -110,8 +110,8 @@ For more information on instruments, see the [ODC documentation](https://opendat
 Stimuli are added to the `data.csv` found in the `dist/` directory as follows:
 
 Currently there are nine directories with images corresponding to nine difficulty levels. 
-These are located in `dist/level1 ... dist/level9` if the `dist` was download. 
-In source code they are located in the `public` directory.
+These are located in `dist/level1 ... dist/level9` if the `dist` was downloaded. 
+In the source code they are located in the `public` directory.
 
 example stimulus
 

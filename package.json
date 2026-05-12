@@ -2,7 +2,7 @@
   "name": "picture-naming-task",
   "type": "module",
   "version": "1.0.0",
-  "packageManager": "pnpm@9.1.4",
+  "packageManager": "pnpm@10.10.0",
   "description": "jsPysch implmentation of the Boston Naming Task with multilingual support",
   "author": "Cian Monnin",
   "scripts": {

@@ -51,30 +51,40 @@ function dataMunger(
   return results;
 }
 
+// quote fields per RFC 4180 and neutralise spreadsheet formula injection
+// (free-text notes / participant IDs starting with = + - @ are executed by Excel)
+function escapeCSVField(value: boolean | number | string | undefined): string {
+  if (value === undefined) return "";
+  let field = String(value);
+  if (typeof value === "string" && /^[=+\-@\t\r]/.test(field)) {
+    field = "'" + field;
+  }
+  if (/[",\r\n]/.test(field)) {
+    field = `"${field.replace(/"/g, '""')}"`;
+  }
+  return field;
+}
+
 function arrayToCSV(
   array: (ExperimentResults | ParticipantIDResult)[],
 ): string {
   let csvContent = "";
-  // check for ID, need to fix error here. .participantID does exsits on this
-  if ("participantID" in array[0]!) {
+  const first = array[0];
+  if (first && "participantID" in first) {
     csvContent += "participantID\n";
-    csvContent += array[0].participantID + "\n";
+    csvContent += escapeCSVField(first.participantID) + "\n";
+  }
+  const trialResults = array.filter(
+    (item): item is ExperimentResults => "stimulus" in item,
+  );
+  if (trialResults.length === 0) {
+    return csvContent;
   }
   // headers
-  csvContent += Object.keys(array[array.length - 1]!).join(",") + "\n";
+  csvContent += Object.keys(trialResults[0]!).join(",") + "\n";
   // append results to csv
-  for (let item of array) {
-    if ("stimulus" in item) {
-      const results = Object.values(item).map((result) => {
-        // incase notes contain commas
-        if (typeof result === "string" && result.includes(",")) {
-          return `"${result}"`;
-        }
-        return result;
-      });
-      const row = results.join(",");
-      csvContent += row + "\n";
-    }
+  for (const item of trialResults) {
+    csvContent += Object.values(item).map(escapeCSVField).join(",") + "\n";
   }
 
   return csvContent;
@@ -82,14 +92,7 @@ function arrayToCSV(
 
 function settingsToCSV(settings: Settings): string {
   const headers = Object.keys(settings).join(",");
-  const values = Object.values(settings)
-    .map((value) => {
-      if (value === undefined) return "";
-      if (typeof value === "boolean") return value.toString();
-      if (typeof value === "string" && value.includes(",")) return `"${value}"`;
-      return value;
-    })
-    .join(",");
+  const values = Object.values(settings).map(escapeCSVField).join(",");
 
   return headers + "\n" + values + "\n";
 }

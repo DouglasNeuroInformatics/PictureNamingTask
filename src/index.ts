@@ -31,7 +31,7 @@ export default defineInstrument({
       }
 
       translator.init();
-      translator.changeLanguage(settingsParseResult.data.language as Language);
+      translator.changeLanguage(settingsParseResult.data.language);
       await pictureNamingTask(done);
     },
   },

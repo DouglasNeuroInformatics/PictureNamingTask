@@ -1,4 +1,3 @@
-import type { Language } from "@opendatacapture/runtime-v1/@opendatacapture/runtime-core/index.js";
 
 import { experimentSettingsJson } from "./experimentSettings.ts";
 import { pictureNamingTask } from "./pictureNamingTask";
@@ -17,6 +16,6 @@ if (!settingsParseResult.success) {
 }
 
 translator.init();
-translator.changeLanguage(settingsParseResult.data.language as Language);
+translator.changeLanguage(settingsParseResult.data.language);
 
 await pictureNamingTask();

@@ -44,22 +44,31 @@ export const $ExperimentResultsUnion = z.union([
   $ExperimentResults,
   $ParticipantIDResult,
 ]);
-export const $Settings = z.object({
-  advancementSchedule: z.coerce.number().positive().int(),
-  downloadOnFinish: z.coerce.boolean(),
-  initialDifficulty: z.coerce.number().positive().int(),
-  language: z.string(),
-  numberOfLevels: z.coerce.number().positive().int(),
-  regressionSchedule: z.coerce.number().int(),
-  seed: z.preprocess(
-    (val) =>
-      val === "" || val === null || val === 0 || val === undefined
-        ? undefined
-        : val,
-    z.coerce.number().positive().int().optional(),
-  ),
-  totalNumberOfTrialsToRun: z.coerce.number().positive().int(),
-});
+export const $Settings = z
+  .object({
+    advancementSchedule: z.coerce.number().positive().int(),
+    // z.coerce.boolean() would turn the string "false" into true
+    downloadOnFinish: z.preprocess(
+      (val) => (val === "false" ? false : val === "true" ? true : val),
+      z.boolean(),
+    ),
+    initialDifficulty: z.coerce.number().positive().int(),
+    language: $Language,
+    numberOfLevels: z.coerce.number().positive().int(),
+    regressionSchedule: z.coerce.number().nonnegative().int(),
+    seed: z.preprocess(
+      (val) =>
+        val === "" || val === null || val === 0 || val === undefined
+          ? undefined
+          : val,
+      z.coerce.number().positive().int().optional(),
+    ),
+    totalNumberOfTrialsToRun: z.coerce.number().positive().int(),
+  })
+  .refine((settings) => settings.initialDifficulty <= settings.numberOfLevels, {
+    message: "initialDifficulty must not exceed numberOfLevels",
+    path: ["initialDifficulty"],
+  });
 
 export const $ExperimentImage = z.object({
   correctResponse: z.string(),

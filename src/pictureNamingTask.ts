@@ -100,6 +100,9 @@ experimentStimuli
   function getRandomElementWithSeed(
     array: ExperimentImage[],
   ): ExperimentImage[] {
+    if (array.length === 0) {
+      throw new Error("no stimuli available for the requested difficulty/language");
+    }
     let randomIndex: number;
     let foundUnique = false;
 
@@ -153,6 +156,19 @@ experimentStimuli
     jsPsych.pluginAPI.keyUp(key);
   }
 
+  // returns on_start/on_finish hooks that share one listener reference so it can actually be removed
+  function clickAsKeyPress(jsPsych: JsPsych) {
+    const handleClick = () => simulateKeyPress(jsPsych, "a");
+    return {
+      on_start: function () {
+        document.addEventListener("click", handleClick, { once: true });
+      },
+      on_finish: function () {
+        document.removeEventListener("click", handleClick);
+      },
+    };
+  }
+
   //****************************
   //********EXPERIMENT**********
   //****************************
@@ -186,14 +202,7 @@ experimentStimuli
     });
 
     const welcome = {
-      on_start: function () {
-        const handleClick = () => simulateKeyPress(jsPsych, "a");
-        document.addEventListener("click", handleClick, { once: true });
-      },
-      on_finish: function () {
-        const handleClick = () => simulateKeyPress(jsPsych, "a");
-        document.removeEventListener("click", handleClick);
-      },
+      ...clickAsKeyPress(jsPsych),
       stimulus: translator.t("welcome"),
       type: HtmlKeyboardResponsePlugin,
     };
@@ -261,14 +270,7 @@ experimentStimuli
       type: HtmlKeyboardResponsePlugin,
     };
     const showImg = {
-      on_start: function () {
-        const handleClick = () => simulateKeyPress(jsPsych, "a");
-        document.addEventListener("click", handleClick, { once: true });
-      },
-      on_finish: function () {
-        const handleClick = () => simulateKeyPress(jsPsych, "a");
-        document.removeEventListener("click", handleClick);
-      },
+      ...clickAsKeyPress(jsPsych),
       stimulus: jsPsych.timelineVariable("stimulus"),
       stimulus_height: 600,
       type: ImageKeyboardResponsePlugin,
@@ -298,18 +300,8 @@ experimentStimuli
         const html = `
           <input type="hidden" id="resultAsNumber" name="resultAsNumber" value=''>
           <h3>${translator.t("logResponse")}</h3>
-          <input type="button" value="${translator.t("correct")}" 
-           onclick="
-             document.getElementById('result').value='${translator.t("correct")}';
-             document.getElementById('resultAsNumber').value='${valueIfCorrect}';
-             document.getElementById('result').style.color='green'
-           ">
-          <input type="button" value="${translator.t("incorrect")}" 
-           onclick="
-             document.getElementById('result').value='${translator.t("incorrect")}';
-             document.getElementById('resultAsNumber').value='${valueIfIncorrect}';
-             document.getElementById('result').style.color='red'
-           ">
+          <input type="button" value="${translator.t("correct")}" data-result-as-number="${valueIfCorrect}" data-color="green">
+          <input type="button" value="${translator.t("incorrect")}" data-result-as-number="${valueIfIncorrect}" data-color="red">
           <br>
           <label for="result">${translator.t("responseWas")}</label>
           <output  id="result" name="result" ></output>
@@ -330,6 +322,7 @@ experimentStimuli
             },
           };
           jsPsych.finishTrial(trialData);
+          return;
         }
         const submitButton = document.getElementById(
           "jspsych-survey-html-form-next",
@@ -337,14 +330,22 @@ experimentStimuli
         const resultOutput = document.getElementById(
           "result",
         ) as HTMLOutputElement;
+        const resultAsNumberInput = document.getElementById(
+          "resultAsNumber",
+        ) as HTMLInputElement;
         submitButton.disabled = true;
-        document.querySelectorAll('input[type="button"]').forEach((button) => {
-          button.addEventListener("click", () => {
-            if (resultOutput.value) {
+        document
+          .querySelectorAll<HTMLInputElement>(
+            "input[type='button'][data-result-as-number]",
+          )
+          .forEach((button) => {
+            button.addEventListener("click", () => {
+              resultOutput.value = button.value;
+              resultOutput.style.color = button.dataset.color ?? "";
+              resultAsNumberInput.value = button.dataset.resultAsNumber ?? "";
               submitButton.disabled = false;
-            }
+            });
           });
-        });
       },
       preamble: function () {
         const html = `<h3>${translator.t("correctResponse")}</h3>
@@ -410,16 +411,16 @@ experimentStimuli
         const lastTrialResults: ParticipantResponse =
           loggingResponseArray[lastTrialIndex]!.response;
 
-        if (lastTrialResults.result === "Correct") {
+        if (lastTrialResults.resultAsNumber === "1") {
           numberOfCorrectAnswers++;
           clearSet = false;
-        } else if (lastTrialResults.result === "Incorrect") {
+        } else if (lastTrialResults.resultAsNumber === "0") {
           numberOfCorrectAnswers = 0;
         }
 
         // difficulty level logic
         if (numberOfCorrectAnswers === advancementSchedule) {
-          if (numberOfCorrectAnswers <= numberOfLevels) {
+          if (currentDifficultyLevel < numberOfLevels) {
             currentDifficultyLevel++;
             numberOfCorrectAnswers = 0;
             clearSet = true;
